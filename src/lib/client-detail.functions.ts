@@ -1,15 +1,19 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { and, desc, eq, inArray } from "drizzle-orm";
+import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { requireAuth } from "@/lib/auth-middleware";
 import { getDb } from "@/lib/db";
 import { logActivity } from "@/lib/activity";
 import {
   client_assignments,
   clients,
+  document_comments,
+  document_files,
   document_requests,
   financial_years,
   profiles,
+  request_items,
   user_roles,
 } from "@/lib/db/schema";
 import { getUserTenant } from "@/lib/db/helpers";
@@ -207,13 +211,80 @@ export const deleteClient = createServerFn({ method: "POST" })
     if (!tenantId) throw new Error("No firm found for your account");
 
     const db = getDb();
-    const now = new Date();
 
+    // Verify this client belongs to the tenant
+    const [clientRow] = await db
+      .select({ id: clients.id })
+      .from(clients)
+      .where(and(eq(clients.id, data.clientId), eq(clients.tenant_id, tenantId)))
+      .limit(1);
+    if (!clientRow) throw new Error("Client not found");
+
+    // 1. Find all document_requests for this client
+    const requests = await db
+      .select({ id: document_requests.id })
+      .from(document_requests)
+      .where(and(eq(document_requests.client_id, data.clientId), eq(document_requests.tenant_id, tenantId)));
+
+    if (requests.length > 0) {
+      const requestIds = requests.map((r) => r.id);
+
+      // 2. Find all request_items for these requests
+      const items = await db
+        .select({ id: request_items.id })
+        .from(request_items)
+        .where(inArray(request_items.request_id, requestIds));
+
+      if (items.length > 0) {
+        const itemIds = items.map((i) => i.id);
+
+        // 3. Find and delete document_files from R2 + DB
+        const files = await db
+          .select({ id: document_files.id, storage_path: document_files.storage_path })
+          .from(document_files)
+          .where(inArray(document_files.request_item_id, itemIds));
+
+        if (files.length > 0) {
+          const accountId = process.env.R2_ACCOUNT_ID;
+          const accessKeyId = process.env.R2_ACCESS_KEY_ID;
+          const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
+          const bucket = process.env.R2_BUCKET_NAME;
+
+          if (accountId && accessKeyId && secretAccessKey && bucket) {
+            const s3 = new S3Client({
+              region: "auto",
+              endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
+              credentials: { accessKeyId, secretAccessKey },
+              forcePathStyle: true,
+            });
+            await Promise.allSettled(
+              files.map((f) =>
+                s3.send(new DeleteObjectCommand({ Bucket: bucket, Key: f.storage_path }))
+              )
+            );
+          }
+
+          await db.delete(document_files).where(inArray(document_files.request_item_id, itemIds));
+        }
+
+        // 4. Delete document_comments
+        await db.delete(document_comments).where(inArray(document_comments.request_item_id, itemIds));
+
+        // 5. Delete request_items
+        await db.delete(request_items).where(inArray(request_items.request_id, requestIds));
+      }
+
+      // 6. Delete document_requests
+      await db.delete(document_requests).where(inArray(document_requests.id, requestIds));
+    }
+
+    // 7. Delete client_assignments
+    await db.delete(client_assignments).where(eq(client_assignments.client_id, data.clientId));
+
+    // 8. Finally delete the client
     await db
       .delete(clients)
-      .where(
-        and(eq(clients.id, data.clientId), eq(clients.tenant_id, tenantId))
-      );
+      .where(and(eq(clients.id, data.clientId), eq(clients.tenant_id, tenantId)));
 
     await logActivity({ tenantId, userId, action: `Deleted client ${data.clientName}`, entityType: "client" });
 

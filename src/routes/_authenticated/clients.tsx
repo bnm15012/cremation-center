@@ -20,6 +20,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Table,
   TableBody,
   TableCell,
@@ -61,6 +71,8 @@ function ClientsPage() {
   const [saving, setSaving] = useState(false);
   const [editTarget, setEditTarget] = useState<ClientRow | null>(null);
   const [editSaving, setEditSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<ClientRow | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const { data: clients, isLoading } = useQuery({
     queryKey: ["clients"],
@@ -152,14 +164,18 @@ function ClientsPage() {
     }
   };
 
-  const handleDelete = async (c: ClientRow) => {
-    if (!confirm(`Delete client "${c.name}"? This removes all their requests and documents.`)) return;
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
     try {
-      await doDeleteClient({ data: { clientId: c.id, clientName: c.name } });
+      await doDeleteClient({ data: { clientId: deleteTarget.id, clientName: deleteTarget.name } });
       toast.success("Client deleted");
       queryClient.invalidateQueries({ queryKey: ["clients"] });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to delete client");
+    } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
     }
   };
 
@@ -296,7 +312,7 @@ function ClientsPage() {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
-                            onClick={(e) => { e.stopPropagation(); handleDelete(c as ClientRow); }}
+                            onClick={(e) => { e.stopPropagation(); setDeleteTarget(c as ClientRow); }}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -335,6 +351,28 @@ function ClientsPage() {
           </div>
         </div>
       )}
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(o) => { if (!o) setDeleteTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete {deleteTarget?.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently remove the client and all their document requests and files. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? "Deleting…" : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Edit client dialog */}
       <Dialog open={!!editTarget} onOpenChange={(o) => { if (!o) setEditTarget(null); }}>

@@ -26,6 +26,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ArrowLeft, KeyRound, Pencil, UserPlus, Search } from "lucide-react";
@@ -57,8 +67,10 @@ function ClientDetailPage() {
   const doUpdateClient = useServerFn(updateClient);
   const [loginOpen, setLoginOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [editSaving, setEditSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [reqSearch, setReqSearch] = useState("");
   const [reqStatus, setReqStatus] = useState("");
 
@@ -101,6 +113,7 @@ function ClientDetailPage() {
       toast.success("Portal login created. Share the credentials with your client.");
       setLoginOpen(false);
       queryClient.invalidateQueries({ queryKey: ["client", clientId] });
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to create login");
     } finally {
@@ -140,13 +153,16 @@ function ClientDetailPage() {
 
   const handleDelete = async () => {
     if (!client) return;
-    if (!confirm(`Delete client ${client.name}? This removes all their requests and documents.`)) return;
+    setDeleting(true);
     try {
       await doDeleteClient({ data: { clientId, clientName: client.name } });
       toast.success("Client deleted");
       navigate({ to: "/clients" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to delete client");
+    } finally {
+      setDeleting(false);
+      setDeleteOpen(false);
     }
   };
 
@@ -238,7 +254,7 @@ function ClientDetailPage() {
             </Dialog>
           )}
           {hasPerm(user, "clients.delete") && (
-            <Button variant="secondary" size="sm" onClick={handleDelete}>
+            <Button variant="secondary" size="sm" onClick={() => setDeleteOpen(true)}>
               Delete
             </Button>
           )}
@@ -362,6 +378,28 @@ function ClientDetailPage() {
           </Card>
         )}
       </div>
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete {client.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently remove the client and all their document requests and files. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? "Deleting…" : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Edit client dialog */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>

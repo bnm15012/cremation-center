@@ -16,6 +16,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, FolderOpen, Search, Trash2 } from "lucide-react";
 
@@ -34,6 +38,8 @@ function RequestsPage() {
   const doDeleteRequest = useServerFn(deleteRequest);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: number; title: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [search, setSearch] = useState("");
   const [filterClient, setFilterClient] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
@@ -106,15 +112,18 @@ function RequestsPage() {
     }
   };
 
-  const handleDelete = async (e: React.MouseEvent, requestId: number, title: string) => {
-    e.stopPropagation();
-    if (!confirm(`Delete "${title}" and all its documents? This cannot be undone.`)) return;
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
     try {
-      await doDeleteRequest({ data: { requestId } });
+      await doDeleteRequest({ data: { requestId: deleteTarget.id } });
       toast.success("Request deleted");
       qc.invalidateQueries({ queryKey: ["requests"] });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to delete request");
+    } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
     }
   };
 
@@ -266,7 +275,7 @@ function RequestsPage() {
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 text-red-400 hover:text-red-600 hover:bg-red-50"
-                        onClick={(e) => handleDelete(e, r.id, r.title)}
+                        onClick={(e) => { e.stopPropagation(); setDeleteTarget({ id: r.id, title: r.title }); }}
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
@@ -303,6 +312,27 @@ function RequestsPage() {
           </div>
         </div>
       )}
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(o) => { if (!o) setDeleteTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete "{deleteTarget?.title}"?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently remove the request and all its documents. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? "Deleting…" : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppShell>
   );
 }

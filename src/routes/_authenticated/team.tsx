@@ -19,6 +19,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -50,6 +54,8 @@ function TeamPage() {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [role, setRole] = useState<"manager" | "staff">("staff");
+  const [deleteTarget, setDeleteTarget] = useState<{ userId: string; name: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 10;
 
@@ -81,14 +87,18 @@ function TeamPage() {
     }
   };
 
-  const handleRemove = async (memberUserId: string, name: string) => {
-    if (!confirm(`Remove ${name} from your firm? Their login will be deleted.`)) return;
+  const handleRemove = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
     try {
-      await remove({ data: { memberUserId } });
+      await remove({ data: { memberUserId: deleteTarget.userId } });
       toast.success("Team member removed");
       queryClient.invalidateQueries({ queryKey: ["team"] });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to remove member");
+    } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
     }
   };
 
@@ -232,7 +242,7 @@ function TeamPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => handleRemove(m.userId, m.profile?.full_name ?? "member")}
+                          onClick={() => setDeleteTarget({ userId: m.userId, name: m.profile?.full_name ?? "member" })}
                         >
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
@@ -277,6 +287,27 @@ function TeamPage() {
           </div>
         );
       })()}
+      {/* Remove member confirmation dialog */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(o) => { if (!o) setDeleteTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove {deleteTarget?.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will remove them from your firm and delete their login. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleRemove}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? "Removing…" : "Remove"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppShell>
   );
 }

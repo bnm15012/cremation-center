@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "71a8b8bc-ce46-47e6-a4b6-e74fbb29dd9e",
+  "id": "bb6b00e2-b2fc-48d9-9247-5d41a32659b9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "activity_logs": {
@@ -21,39 +21,25 @@
           "notNull": true,
           "autoincrement": false
         },
-        "entity_type": {
-          "name": "entity_type",
-          "type": "varchar(100)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "entity_id": {
-          "name": "entity_id",
-          "type": "varchar(100)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "details": {
-          "name": "details",
-          "type": "json",
+        "record_id": {
+          "name": "record_id",
+          "type": "int",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "user_id": {
           "name": "user_id",
-          "type": "varchar(36)",
+          "type": "int",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "tenant_id": {
-          "name": "tenant_id",
-          "type": "int",
+        "details": {
+          "name": "details",
+          "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "created_at": {
@@ -67,12 +53,25 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "activity_logs_tenant_id_tenants_id_fk": {
-          "name": "activity_logs_tenant_id_tenants_id_fk",
+        "activity_logs_record_id_cremation_records_id_fk": {
+          "name": "activity_logs_record_id_cremation_records_id_fk",
           "tableFrom": "activity_logs",
-          "tableTo": "tenants",
+          "tableTo": "cremation_records",
           "columnsFrom": [
-            "tenant_id"
+            "record_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "activity_logs_user_id_users_id_fk": {
+          "name": "activity_logs_user_id_users_id_fk",
+          "tableFrom": "activity_logs",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
           ],
           "columnsTo": [
             "id"
@@ -92,8 +91,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "client_assignments": {
-      "name": "client_assignments",
+    "cremation_records": {
+      "name": "cremation_records",
       "columns": {
         "id": {
           "name": "id",
@@ -102,117 +101,178 @@
           "notNull": true,
           "autoincrement": true
         },
-        "client_id": {
-          "name": "client_id",
-          "type": "int",
+        "deceased_name": {
+          "name": "deceased_name",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "varchar(36)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "tenant_id": {
-          "name": "tenant_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
+        "date_of_birth": {
+          "name": "date_of_birth",
           "type": "datetime",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'1970-01-01 00:00:00.000'"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "client_assignments_client_id_clients_id_fk": {
-          "name": "client_assignments_client_id_clients_id_fk",
-          "tableFrom": "client_assignments",
-          "tableTo": "clients",
-          "columnsFrom": [
-            "client_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "client_assignments_tenant_id_tenants_id_fk": {
-          "name": "client_assignments_tenant_id_tenants_id_fk",
-          "tableFrom": "client_assignments",
-          "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "client_assignments_id": {
-          "name": "client_assignments_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "clients": {
-      "name": "clients",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "email": {
-          "name": "email",
-          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "mobile": {
-          "name": "mobile",
+        "date_of_death": {
+          "name": "date_of_death",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "time_of_death": {
+          "name": "time_of_death",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "age_at_death": {
+          "name": "age_at_death",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "gender": {
+          "name": "gender",
+          "type": "enum('male','female','other')",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "nationality": {
+          "name": "nationality",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "religion": {
+          "name": "religion",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "place_of_death": {
+          "name": "place_of_death",
+          "type": "varchar(500)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "cremation_date": {
+          "name": "cremation_date",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "cremation_time": {
+          "name": "cremation_time",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "funeral_pyre_no": {
+          "name": "funeral_pyre_no",
           "type": "varchar(50)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "pan": {
-          "name": "pan",
-          "type": "varchar(20)",
+        "next_of_kin_name": {
+          "name": "next_of_kin_name",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "gstin": {
-          "name": "gstin",
-          "type": "varchar(20)",
+        "next_of_kin_phone": {
+          "name": "next_of_kin_phone",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "next_of_kin_relation": {
+          "name": "next_of_kin_relation",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "next_of_kin_address": {
+          "name": "next_of_kin_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "cause_of_death": {
+          "name": "cause_of_death",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "doctor_name": {
+          "name": "doctor_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "hospital_name": {
+          "name": "hospital_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "death_certificate_no": {
+          "name": "death_certificate_no",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "record_status": {
+          "name": "record_status",
+          "type": "enum('draft','submitted','approved','rejected')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'draft'"
+        },
+        "rejection_reason": {
+          "name": "rejection_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "reviewed_by": {
+          "name": "reviewed_by",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "reviewed_at": {
+          "name": "reviewed_at",
+          "type": "datetime",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -222,28 +282,6 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
-        },
-        "is_active": {
-          "name": "is_active",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": true
-        },
-        "portal_user_id": {
-          "name": "portal_user_id",
-          "type": "varchar(36)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "tenant_id": {
-          "name": "tenant_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
           "autoincrement": false
         },
         "created_at": {
@@ -265,12 +303,25 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "clients_tenant_id_tenants_id_fk": {
-          "name": "clients_tenant_id_tenants_id_fk",
-          "tableFrom": "clients",
-          "tableTo": "tenants",
+        "cremation_records_created_by_users_id_fk": {
+          "name": "cremation_records_created_by_users_id_fk",
+          "tableFrom": "cremation_records",
+          "tableTo": "users",
           "columnsFrom": [
-            "tenant_id"
+            "created_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "cremation_records_reviewed_by_users_id_fk": {
+          "name": "cremation_records_reviewed_by_users_id_fk",
+          "tableFrom": "cremation_records",
+          "tableTo": "users",
+          "columnsFrom": [
+            "reviewed_by"
           ],
           "columnsTo": [
             "id"
@@ -280,8 +331,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "clients_id": {
-          "name": "clients_id",
+        "cremation_records_id": {
+          "name": "cremation_records_id",
           "columns": [
             "id"
           ]
@@ -290,8 +341,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "coupons": {
-      "name": "coupons",
+    "documents": {
+      "name": "documents",
       "columns": {
         "id": {
           "name": "id",
@@ -300,153 +351,12 @@
           "notNull": true,
           "autoincrement": true
         },
-        "code": {
-          "name": "code",
-          "type": "varchar(100)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "percent_off": {
-          "name": "percent_off",
+        "record_id": {
+          "name": "record_id",
           "type": "int",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
-        },
-        "is_active": {
-          "name": "is_active",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": true
-        },
-        "expires_at": {
-          "name": "expires_at",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'1970-01-01 00:00:00.000'"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {
-        "coupons_id": {
-          "name": "coupons_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "document_comments": {
-      "name": "document_comments",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "body": {
-          "name": "body",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "request_item_id": {
-          "name": "request_item_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "varchar(36)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "tenant_id": {
-          "name": "tenant_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'1970-01-01 00:00:00.000'"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "document_comments_request_item_id_request_items_id_fk": {
-          "name": "document_comments_request_item_id_request_items_id_fk",
-          "tableFrom": "document_comments",
-          "tableTo": "request_items",
-          "columnsFrom": [
-            "request_item_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "document_comments_tenant_id_tenants_id_fk": {
-          "name": "document_comments_tenant_id_tenants_id_fk",
-          "tableFrom": "document_comments",
-          "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "document_comments_id": {
-          "name": "document_comments_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "document_files": {
-      "name": "document_files",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
         },
         "file_name": {
           "name": "file_name",
@@ -477,30 +387,15 @@
           "autoincrement": false,
           "default": 0
         },
-        "version": {
-          "name": "version",
-          "type": "int",
+        "document_type": {
+          "name": "document_type",
+          "type": "varchar(100)",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 1
-        },
-        "request_item_id": {
-          "name": "request_item_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "uploaded_by": {
           "name": "uploaded_by",
-          "type": "varchar(36)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "tenant_id": {
-          "name": "tenant_id",
           "type": "int",
           "primaryKey": false,
           "notNull": true,
@@ -517,12 +412,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "document_files_request_item_id_request_items_id_fk": {
-          "name": "document_files_request_item_id_request_items_id_fk",
-          "tableFrom": "document_files",
-          "tableTo": "request_items",
+        "documents_record_id_cremation_records_id_fk": {
+          "name": "documents_record_id_cremation_records_id_fk",
+          "tableFrom": "documents",
+          "tableTo": "cremation_records",
           "columnsFrom": [
-            "request_item_id"
+            "record_id"
           ],
           "columnsTo": [
             "id"
@@ -530,155 +425,12 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "document_files_tenant_id_tenants_id_fk": {
-          "name": "document_files_tenant_id_tenants_id_fk",
-          "tableFrom": "document_files",
-          "tableTo": "tenants",
+        "documents_uploaded_by_users_id_fk": {
+          "name": "documents_uploaded_by_users_id_fk",
+          "tableFrom": "documents",
+          "tableTo": "users",
           "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "document_files_id": {
-          "name": "document_files_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "document_requests": {
-      "name": "document_requests",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "title": {
-          "name": "title",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "request_status": {
-          "name": "request_status",
-          "type": "enum('open','completed','archived')",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'open'"
-        },
-        "client_id": {
-          "name": "client_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "financial_year_id": {
-          "name": "financial_year_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "template_id": {
-          "name": "template_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "created_by": {
-          "name": "created_by",
-          "type": "varchar(36)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "tenant_id": {
-          "name": "tenant_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'1970-01-01 00:00:00.000'"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'1970-01-01 00:00:00.000'"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "document_requests_client_id_clients_id_fk": {
-          "name": "document_requests_client_id_clients_id_fk",
-          "tableFrom": "document_requests",
-          "tableTo": "clients",
-          "columnsFrom": [
-            "client_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "document_requests_financial_year_id_financial_years_id_fk": {
-          "name": "document_requests_financial_year_id_financial_years_id_fk",
-          "tableFrom": "document_requests",
-          "tableTo": "financial_years",
-          "columnsFrom": [
-            "financial_year_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "document_requests_template_id_document_templates_id_fk": {
-          "name": "document_requests_template_id_document_templates_id_fk",
-          "tableFrom": "document_requests",
-          "tableTo": "document_templates",
-          "columnsFrom": [
-            "template_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "document_requests_tenant_id_tenants_id_fk": {
-          "name": "document_requests_tenant_id_tenants_id_fk",
-          "tableFrom": "document_requests",
-          "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
+            "uploaded_by"
           ],
           "columnsTo": [
             "id"
@@ -688,8 +440,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "document_requests_id": {
-          "name": "document_requests_id",
+        "documents_id": {
+          "name": "documents_id",
           "columns": [
             "id"
           ]
@@ -698,123 +450,26 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "document_templates": {
-      "name": "document_templates",
+    "sessions": {
+      "name": "sessions",
       "columns": {
         "id": {
           "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
+          "type": "varchar(64)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "tenant_id": {
-          "name": "tenant_id",
+        "user_id": {
+          "name": "user_id",
           "type": "int",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "created_at": {
-          "name": "created_at",
+        "expires_at": {
+          "name": "expires_at",
           "type": "datetime",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'1970-01-01 00:00:00.000'"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'1970-01-01 00:00:00.000'"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "document_templates_tenant_id_tenants_id_fk": {
-          "name": "document_templates_tenant_id_tenants_id_fk",
-          "tableFrom": "document_templates",
-          "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "document_templates_id": {
-          "name": "document_templates_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "financial_years": {
-      "name": "financial_years",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "label": {
-          "name": "label",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "start_date": {
-          "name": "start_date",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "end_date": {
-          "name": "end_date",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "is_active": {
-          "name": "is_active",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": true
-        },
-        "tenant_id": {
-          "name": "tenant_id",
-          "type": "int",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -830,12 +485,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "financial_years_tenant_id_tenants_id_fk": {
-          "name": "financial_years_tenant_id_tenants_id_fk",
-          "tableFrom": "financial_years",
-          "tableTo": "tenants",
+        "sessions_user_id_users_id_fk": {
+          "name": "sessions_user_id_users_id_fk",
+          "tableFrom": "sessions",
+          "tableTo": "users",
           "columnsFrom": [
-            "tenant_id"
+            "user_id"
           ],
           "columnsTo": [
             "id"
@@ -845,8 +500,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "financial_years_id": {
-          "name": "financial_years_id",
+        "sessions_id": {
+          "name": "sessions_id",
           "columns": [
             "id"
           ]
@@ -855,8 +510,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "payments": {
-      "name": "payments",
+    "users": {
+      "name": "users",
       "columns": {
         "id": {
           "name": "id",
@@ -865,230 +520,16 @@
           "notNull": true,
           "autoincrement": true
         },
-        "amount": {
-          "name": "amount",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "currency": {
-          "name": "currency",
-          "type": "varchar(10)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'INR'"
-        },
-        "status": {
-          "name": "status",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'pending'"
-        },
-        "razorpay_order_id": {
-          "name": "razorpay_order_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "razorpay_payment_id": {
-          "name": "razorpay_payment_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "subscription_id": {
-          "name": "subscription_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "tenant_id": {
-          "name": "tenant_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'1970-01-01 00:00:00.000'"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "payments_subscription_id_subscriptions_id_fk": {
-          "name": "payments_subscription_id_subscriptions_id_fk",
-          "tableFrom": "payments",
-          "tableTo": "subscriptions",
-          "columnsFrom": [
-            "subscription_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "payments_tenant_id_tenants_id_fk": {
-          "name": "payments_tenant_id_tenants_id_fk",
-          "tableFrom": "payments",
-          "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "payments_id": {
-          "name": "payments_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "plans": {
-      "name": "plans",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "name": {
-          "name": "name",
+        "email": {
+          "name": "email",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "price_monthly": {
-          "name": "price_monthly",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "price_yearly": {
-          "name": "price_yearly",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "max_clients": {
-          "name": "max_clients",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "max_staff": {
-          "name": "max_staff",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "max_templates": {
-          "name": "max_templates",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "storage_gb": {
-          "name": "storage_gb",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 1
-        },
-        "features": {
-          "name": "features",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "('[]')"
-        },
-        "is_active": {
-          "name": "is_active",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": true
-        },
-        "sort_order": {
-          "name": "sort_order",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'1970-01-01 00:00:00.000'"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {
-        "plans_id": {
-          "name": "plans_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "profiles": {
-      "name": "profiles",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "varchar(36)",
+        "password_hash": {
+          "name": "password_hash",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -1101,564 +542,21 @@
           "autoincrement": false,
           "default": "''"
         },
-        "email": {
-          "name": "email",
-          "type": "varchar(255)",
+        "role": {
+          "name": "role",
+          "type": "enum('admin','staff')",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "''"
+          "default": "'staff'"
         },
-        "phone": {
-          "name": "phone",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "tenant_id": {
-          "name": "tenant_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'1970-01-01 00:00:00.000'"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'1970-01-01 00:00:00.000'"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "profiles_tenant_id_tenants_id_fk": {
-          "name": "profiles_tenant_id_tenants_id_fk",
-          "tableFrom": "profiles",
-          "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "profiles_id": {
-          "name": "profiles_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "request_items": {
-      "name": "request_items",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "label": {
-          "name": "label",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "category": {
-          "name": "category",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "sort_order": {
-          "name": "sort_order",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "is_required": {
-          "name": "is_required",
+        "is_active": {
+          "name": "is_active",
           "type": "boolean",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": true
-        },
-        "is_repeatable": {
-          "name": "is_repeatable",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": false
-        },
-        "doc_status": {
-          "name": "doc_status",
-          "type": "enum('pending','uploaded','under_review','approved','rejected','reupload_required')",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'pending'"
-        },
-        "request_id": {
-          "name": "request_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "reviewed_by": {
-          "name": "reviewed_by",
-          "type": "varchar(36)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "reviewed_at": {
-          "name": "reviewed_at",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "tenant_id": {
-          "name": "tenant_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'1970-01-01 00:00:00.000'"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'1970-01-01 00:00:00.000'"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "request_items_request_id_document_requests_id_fk": {
-          "name": "request_items_request_id_document_requests_id_fk",
-          "tableFrom": "request_items",
-          "tableTo": "document_requests",
-          "columnsFrom": [
-            "request_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "request_items_tenant_id_tenants_id_fk": {
-          "name": "request_items_tenant_id_tenants_id_fk",
-          "tableFrom": "request_items",
-          "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "request_items_id": {
-          "name": "request_items_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "role_permissions": {
-      "name": "role_permissions",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "role_id": {
-          "name": "role_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "permission": {
-          "name": "permission",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "role_permissions_role_id_roles_id_fk": {
-          "name": "role_permissions_role_id_roles_id_fk",
-          "tableFrom": "role_permissions",
-          "tableTo": "roles",
-          "columnsFrom": [
-            "role_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "role_permissions_id": {
-          "name": "role_permissions_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "roles": {
-      "name": "roles",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "tenant_id": {
-          "name": "tenant_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'1970-01-01 00:00:00.000'"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "roles_tenant_id_tenants_id_fk": {
-          "name": "roles_tenant_id_tenants_id_fk",
-          "tableFrom": "roles",
-          "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "roles_id": {
-          "name": "roles_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "subscriptions": {
-      "name": "subscriptions",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "subscription_status": {
-          "name": "subscription_status",
-          "type": "enum('trial','active','past_due','expired','cancelled')",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'trial'"
-        },
-        "billing_period": {
-          "name": "billing_period",
-          "type": "varchar(20)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'monthly'"
-        },
-        "plan_id": {
-          "name": "plan_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "razorpay_subscription_id": {
-          "name": "razorpay_subscription_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "current_period_start": {
-          "name": "current_period_start",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "current_period_end": {
-          "name": "current_period_end",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "tenant_id": {
-          "name": "tenant_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'1970-01-01 00:00:00.000'"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'1970-01-01 00:00:00.000'"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "subscriptions_plan_id_plans_id_fk": {
-          "name": "subscriptions_plan_id_plans_id_fk",
-          "tableFrom": "subscriptions",
-          "tableTo": "plans",
-          "columnsFrom": [
-            "plan_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "subscriptions_tenant_id_tenants_id_fk": {
-          "name": "subscriptions_tenant_id_tenants_id_fk",
-          "tableFrom": "subscriptions",
-          "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "subscriptions_id": {
-          "name": "subscriptions_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "template_items": {
-      "name": "template_items",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "category": {
-          "name": "category",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "sort_order": {
-          "name": "sort_order",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        },
-        "is_required": {
-          "name": "is_required",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": true
-        },
-        "is_repeatable": {
-          "name": "is_repeatable",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": false
-        },
-        "template_id": {
-          "name": "template_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "template_items_template_id_document_templates_id_fk": {
-          "name": "template_items_template_id_document_templates_id_fk",
-          "tableFrom": "template_items",
-          "tableTo": "document_templates",
-          "columnsFrom": [
-            "template_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "template_items_id": {
-          "name": "template_items_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "tenants": {
-      "name": "tenants",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "tenant_status": {
-          "name": "tenant_status",
-          "type": "enum('active','suspended')",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'active'"
         },
         "created_at": {
           "name": "created_at",
@@ -1680,125 +578,21 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "tenants_id": {
-          "name": "tenants_id",
+        "users_id": {
+          "name": "users_id",
           "columns": [
             "id"
           ]
         }
       },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "user_custom_roles": {
-      "name": "user_custom_roles",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "varchar(36)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "role_id": {
-          "name": "role_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "user_custom_roles_role_id_roles_id_fk": {
-          "name": "user_custom_roles_role_id_roles_id_fk",
-          "tableFrom": "user_custom_roles",
-          "tableTo": "roles",
-          "columnsFrom": [
-            "role_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "user_custom_roles_id": {
-          "name": "user_custom_roles_id",
+      "uniqueConstraints": {
+        "users_email_unique": {
+          "name": "users_email_unique",
           "columns": [
-            "id"
+            "email"
           ]
         }
       },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "user_roles": {
-      "name": "user_roles",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "varchar(36)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "app_role": {
-          "name": "app_role",
-          "type": "enum('super_admin','ca_admin','manager','staff','client')",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "tenant_id": {
-          "name": "tenant_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "user_roles_tenant_id_tenants_id_fk": {
-          "name": "user_roles_tenant_id_tenants_id_fk",
-          "tableFrom": "user_roles",
-          "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "user_roles_id": {
-          "name": "user_roles_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
       "checkConstraint": {}
     }
   },

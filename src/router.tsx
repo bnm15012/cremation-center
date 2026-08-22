@@ -6,20 +6,26 @@ export const getRouter = () => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 30_000,        // data stays fresh for 30s — no refetch on navigation
-        gcTime: 5 * 60_000,       // keep unused cache for 5 mins
-        refetchOnWindowFocus: false, // don't refetch just because user switched tabs
-        retry: 1,                 // retry failed requests once only
+        staleTime: 30_000,
+        gcTime: 5 * 60_000,
+        refetchOnWindowFocus: false,
+        retry: 1,
       },
     },
   });
 
   const router = createRouter({
     routeTree,
-    context: { queryClient },
+    context: { queryClient, session: null },
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,
   });
 
   return router;
 };
+
+declare module "@tanstack/react-router" {
+  interface Register {
+    router: ReturnType<typeof getRouter>;
+  }
+}

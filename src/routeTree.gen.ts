@@ -9,257 +9,208 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ConfirmRouteImport } from './routes/confirm'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedTemplatesRouteImport } from './routes/_authenticated/templates'
-import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated/team'
-import { Route as AuthenticatedRolesRouteImport } from './routes/_authenticated/roles'
-import { Route as AuthenticatedRequestsRouteImport } from './routes/_authenticated/requests'
-import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
-import { Route as AuthenticatedFinancialYearsRouteImport } from './routes/_authenticated/financial-years'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedClientsRouteImport } from './routes/_authenticated/clients'
-import { Route as AuthenticatedBillingRouteImport } from './routes/_authenticated/billing'
-import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated/activity'
-import { Route as AuthenticatedTemplatesTemplateIdRouteImport } from './routes/_authenticated/templates_.$templateId'
-import { Route as AuthenticatedRequestsRequestIdRouteImport } from './routes/_authenticated/requests_.$requestId'
-import { Route as AuthenticatedClientsClientIdRouteImport } from './routes/_authenticated/clients_.$clientId'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as AcceptInviteRouteImport } from './routes/accept-invite'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AppChangePasswordRouteImport } from './routes/_app.change-password'
+import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppRecordsRouteImport } from './routes/_app.records'
+import { Route as AppAdminUsersRouteImport } from './routes/_app.admin.users'
+import { Route as AppRecordsIndexRouteImport } from './routes/_app.records.index'
+import { Route as AppRecordsIdRouteImport } from './routes/_app.records.$id'
+import { Route as AppRecordsNewRouteImport } from './routes/_app.records.new'
+import { Route as AppRecordsIdCertificateRouteImport } from './routes/_app.records.$id.certificate'
+import { Route as AppRecordsIdEditRouteImport } from './routes/_app.records.$id.edit'
 
-const ConfirmRoute = ConfirmRouteImport.update({
-  id: '/confirm',
-  path: '/confirm',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedTemplatesRoute = AuthenticatedTemplatesRouteImport.update({
-  id: '/templates',
-  path: '/templates',
-  getParentRoute: () => AuthenticatedRouteRoute,
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedTeamRoute = AuthenticatedTeamRouteImport.update({
-  id: '/team',
-  path: '/team',
-  getParentRoute: () => AuthenticatedRouteRoute,
+const AcceptInviteRoute = AcceptInviteRouteImport.update({
+  id: '/accept-invite',
+  path: '/accept-invite',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRolesRoute = AuthenticatedRolesRouteImport.update({
-  id: '/roles',
-  path: '/roles',
-  getParentRoute: () => AuthenticatedRouteRoute,
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRequestsRoute = AuthenticatedRequestsRouteImport.update({
-  id: '/requests',
-  path: '/requests',
-  getParentRoute: () => AuthenticatedRouteRoute,
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedPortalRoute = AuthenticatedPortalRouteImport.update({
-  id: '/portal',
-  path: '/portal',
-  getParentRoute: () => AuthenticatedRouteRoute,
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedFinancialYearsRoute =
-  AuthenticatedFinancialYearsRouteImport.update({
-    id: '/financial-years',
-    path: '/financial-years',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+const AppChangePasswordRoute = AppChangePasswordRouteImport.update({
+  id: '/change-password',
+  path: '/change-password',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  getParentRoute: () => AppRoute,
 } as any)
-const AuthenticatedClientsRoute = AuthenticatedClientsRouteImport.update({
-  id: '/clients',
-  path: '/clients',
-  getParentRoute: () => AuthenticatedRouteRoute,
+const AppRecordsRoute = AppRecordsRouteImport.update({
+  id: '/records',
+  path: '/records',
+  getParentRoute: () => AppRoute,
 } as any)
-const AuthenticatedBillingRoute = AuthenticatedBillingRouteImport.update({
-  id: '/billing',
-  path: '/billing',
-  getParentRoute: () => AuthenticatedRouteRoute,
+const AppAdminUsersRoute = AppAdminUsersRouteImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
+  getParentRoute: () => AppRoute,
 } as any)
-const AuthenticatedActivityRoute = AuthenticatedActivityRouteImport.update({
-  id: '/activity',
-  path: '/activity',
-  getParentRoute: () => AuthenticatedRouteRoute,
+const AppRecordsIndexRoute = AppRecordsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRecordsRoute,
 } as any)
-const AuthenticatedTemplatesTemplateIdRoute =
-  AuthenticatedTemplatesTemplateIdRouteImport.update({
-    id: '/templates_/$templateId',
-    path: '/templates/$templateId',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedRequestsRequestIdRoute =
-  AuthenticatedRequestsRequestIdRouteImport.update({
-    id: '/requests_/$requestId',
-    path: '/requests/$requestId',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedClientsClientIdRoute =
-  AuthenticatedClientsClientIdRouteImport.update({
-    id: '/clients_/$clientId',
-    path: '/clients/$clientId',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
+const AppRecordsIdRoute = AppRecordsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppRecordsRoute,
+} as any)
+const AppRecordsNewRoute = AppRecordsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AppRecordsRoute,
+} as any)
+const AppRecordsIdCertificateRoute = AppRecordsIdCertificateRouteImport.update({
+  id: '/certificate',
+  path: '/certificate',
+  getParentRoute: () => AppRecordsIdRoute,
+} as any)
+const AppRecordsIdEditRoute = AppRecordsIdEditRouteImport.update({
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => AppRecordsIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
-  '/confirm': typeof ConfirmRoute
-  '/activity': typeof AuthenticatedActivityRoute
-  '/billing': typeof AuthenticatedBillingRoute
-  '/clients': typeof AuthenticatedClientsRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
-  '/financial-years': typeof AuthenticatedFinancialYearsRoute
-  '/portal': typeof AuthenticatedPortalRoute
-  '/requests': typeof AuthenticatedRequestsRoute
-  '/roles': typeof AuthenticatedRolesRoute
-  '/team': typeof AuthenticatedTeamRoute
-  '/templates': typeof AuthenticatedTemplatesRoute
-  '/clients/$clientId': typeof AuthenticatedClientsClientIdRoute
-  '/requests/$requestId': typeof AuthenticatedRequestsRequestIdRoute
-  '/templates/$templateId': typeof AuthenticatedTemplatesTemplateIdRoute
+  '/accept-invite': typeof AcceptInviteRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/change-password': typeof AppChangePasswordRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/records': typeof AppRecordsRouteWithChildren
+  '/admin/users': typeof AppAdminUsersRoute
+  '/records/$id': typeof AppRecordsIdRouteWithChildren
+  '/records/new': typeof AppRecordsNewRoute
+  '/records/': typeof AppRecordsIndexRoute
+  '/records/$id/certificate': typeof AppRecordsIdCertificateRoute
+  '/records/$id/edit': typeof AppRecordsIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
-  '/confirm': typeof ConfirmRoute
-  '/activity': typeof AuthenticatedActivityRoute
-  '/billing': typeof AuthenticatedBillingRoute
-  '/clients': typeof AuthenticatedClientsRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
-  '/financial-years': typeof AuthenticatedFinancialYearsRoute
-  '/portal': typeof AuthenticatedPortalRoute
-  '/requests': typeof AuthenticatedRequestsRoute
-  '/roles': typeof AuthenticatedRolesRoute
-  '/team': typeof AuthenticatedTeamRoute
-  '/templates': typeof AuthenticatedTemplatesRoute
-  '/clients/$clientId': typeof AuthenticatedClientsClientIdRoute
-  '/requests/$requestId': typeof AuthenticatedRequestsRequestIdRoute
-  '/templates/$templateId': typeof AuthenticatedTemplatesTemplateIdRoute
+  '/accept-invite': typeof AcceptInviteRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/change-password': typeof AppChangePasswordRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/admin/users': typeof AppAdminUsersRoute
+  '/records/$id': typeof AppRecordsIdRouteWithChildren
+  '/records/new': typeof AppRecordsNewRoute
+  '/records': typeof AppRecordsIndexRoute
+  '/records/$id/certificate': typeof AppRecordsIdCertificateRoute
+  '/records/$id/edit': typeof AppRecordsIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/auth': typeof AuthRoute
-  '/confirm': typeof ConfirmRoute
-  '/_authenticated/activity': typeof AuthenticatedActivityRoute
-  '/_authenticated/billing': typeof AuthenticatedBillingRoute
-  '/_authenticated/clients': typeof AuthenticatedClientsRoute
-  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/financial-years': typeof AuthenticatedFinancialYearsRoute
-  '/_authenticated/portal': typeof AuthenticatedPortalRoute
-  '/_authenticated/requests': typeof AuthenticatedRequestsRoute
-  '/_authenticated/roles': typeof AuthenticatedRolesRoute
-  '/_authenticated/team': typeof AuthenticatedTeamRoute
-  '/_authenticated/templates': typeof AuthenticatedTemplatesRoute
-  '/_authenticated/clients_/$clientId': typeof AuthenticatedClientsClientIdRoute
-  '/_authenticated/requests_/$requestId': typeof AuthenticatedRequestsRequestIdRoute
-  '/_authenticated/templates_/$templateId': typeof AuthenticatedTemplatesTemplateIdRoute
+  '/_app': typeof AppRouteWithChildren
+  '/accept-invite': typeof AcceptInviteRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/_app/change-password': typeof AppChangePasswordRoute
+  '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/records': typeof AppRecordsRouteWithChildren
+  '/_app/admin/users': typeof AppAdminUsersRoute
+  '/_app/records/$id': typeof AppRecordsIdRouteWithChildren
+  '/_app/records/new': typeof AppRecordsNewRoute
+  '/_app/records/': typeof AppRecordsIndexRoute
+  '/_app/records/$id/certificate': typeof AppRecordsIdCertificateRoute
+  '/_app/records/$id/edit': typeof AppRecordsIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/auth'
-    | '/confirm'
-    | '/activity'
-    | '/billing'
-    | '/clients'
+    | '/accept-invite'
+    | '/forgot-password'
+    | '/login'
+    | '/reset-password'
+    | '/change-password'
     | '/dashboard'
-    | '/financial-years'
-    | '/portal'
-    | '/requests'
-    | '/roles'
-    | '/team'
-    | '/templates'
-    | '/clients/$clientId'
-    | '/requests/$requestId'
-    | '/templates/$templateId'
+    | '/records'
+    | '/admin/users'
+    | '/records/$id'
+    | '/records/new'
+    | '/records/'
+    | '/records/$id/certificate'
+    | '/records/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/auth'
-    | '/confirm'
-    | '/activity'
-    | '/billing'
-    | '/clients'
+    | '/accept-invite'
+    | '/forgot-password'
+    | '/login'
+    | '/reset-password'
+    | '/change-password'
     | '/dashboard'
-    | '/financial-years'
-    | '/portal'
-    | '/requests'
-    | '/roles'
-    | '/team'
-    | '/templates'
-    | '/clients/$clientId'
-    | '/requests/$requestId'
-    | '/templates/$templateId'
+    | '/admin/users'
+    | '/records/$id'
+    | '/records/new'
+    | '/records'
+    | '/records/$id/certificate'
+    | '/records/$id/edit'
   id:
     | '__root__'
     | '/'
-    | '/_authenticated'
-    | '/auth'
-    | '/confirm'
-    | '/_authenticated/activity'
-    | '/_authenticated/billing'
-    | '/_authenticated/clients'
-    | '/_authenticated/dashboard'
-    | '/_authenticated/financial-years'
-    | '/_authenticated/portal'
-    | '/_authenticated/requests'
-    | '/_authenticated/roles'
-    | '/_authenticated/team'
-    | '/_authenticated/templates'
-    | '/_authenticated/clients_/$clientId'
-    | '/_authenticated/requests_/$requestId'
-    | '/_authenticated/templates_/$templateId'
+    | '/_app'
+    | '/accept-invite'
+    | '/forgot-password'
+    | '/login'
+    | '/reset-password'
+    | '/_app/change-password'
+    | '/_app/dashboard'
+    | '/_app/records'
+    | '/_app/admin/users'
+    | '/_app/records/$id'
+    | '/_app/records/new'
+    | '/_app/records/'
+    | '/_app/records/$id/certificate'
+    | '/_app/records/$id/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  AuthRoute: typeof AuthRoute
-  ConfirmRoute: typeof ConfirmRoute
+  AppRoute: typeof AppRouteWithChildren
+  AcceptInviteRoute: typeof AcceptInviteRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  LoginRoute: typeof LoginRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/confirm': {
-      id: '/confirm'
-      path: '/confirm'
-      fullPath: '/confirm'
-      preLoaderRoute: typeof ConfirmRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -267,140 +218,160 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/templates': {
-      id: '/_authenticated/templates'
-      path: '/templates'
-      fullPath: '/templates'
-      preLoaderRoute: typeof AuthenticatedTemplatesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/team': {
-      id: '/_authenticated/team'
-      path: '/team'
-      fullPath: '/team'
-      preLoaderRoute: typeof AuthenticatedTeamRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/accept-invite': {
+      id: '/accept-invite'
+      path: '/accept-invite'
+      fullPath: '/accept-invite'
+      preLoaderRoute: typeof AcceptInviteRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/roles': {
-      id: '/_authenticated/roles'
-      path: '/roles'
-      fullPath: '/roles'
-      preLoaderRoute: typeof AuthenticatedRolesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/requests': {
-      id: '/_authenticated/requests'
-      path: '/requests'
-      fullPath: '/requests'
-      preLoaderRoute: typeof AuthenticatedRequestsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/portal': {
-      id: '/_authenticated/portal'
-      path: '/portal'
-      fullPath: '/portal'
-      preLoaderRoute: typeof AuthenticatedPortalRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/financial-years': {
-      id: '/_authenticated/financial-years'
-      path: '/financial-years'
-      fullPath: '/financial-years'
-      preLoaderRoute: typeof AuthenticatedFinancialYearsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/_app/change-password': {
+      id: '/_app/change-password'
+      path: '/change-password'
+      fullPath: '/change-password'
+      preLoaderRoute: typeof AppChangePasswordRouteImport
+      parentRoute: typeof AppRoute
     }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
     }
-    '/_authenticated/clients': {
-      id: '/_authenticated/clients'
-      path: '/clients'
-      fullPath: '/clients'
-      preLoaderRoute: typeof AuthenticatedClientsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/_app/records': {
+      id: '/_app/records'
+      path: '/records'
+      fullPath: '/records'
+      preLoaderRoute: typeof AppRecordsRouteImport
+      parentRoute: typeof AppRoute
     }
-    '/_authenticated/billing': {
-      id: '/_authenticated/billing'
-      path: '/billing'
-      fullPath: '/billing'
-      preLoaderRoute: typeof AuthenticatedBillingRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/_app/admin/users': {
+      id: '/_app/admin/users'
+      path: '/admin/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AppAdminUsersRouteImport
+      parentRoute: typeof AppRoute
     }
-    '/_authenticated/activity': {
-      id: '/_authenticated/activity'
-      path: '/activity'
-      fullPath: '/activity'
-      preLoaderRoute: typeof AuthenticatedActivityRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/_app/records/': {
+      id: '/_app/records/'
+      path: '/'
+      fullPath: '/records/'
+      preLoaderRoute: typeof AppRecordsIndexRouteImport
+      parentRoute: typeof AppRecordsRoute
     }
-    '/_authenticated/templates_/$templateId': {
-      id: '/_authenticated/templates_/$templateId'
-      path: '/templates/$templateId'
-      fullPath: '/templates/$templateId'
-      preLoaderRoute: typeof AuthenticatedTemplatesTemplateIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/_app/records/$id': {
+      id: '/_app/records/$id'
+      path: '/$id'
+      fullPath: '/records/$id'
+      preLoaderRoute: typeof AppRecordsIdRouteImport
+      parentRoute: typeof AppRecordsRoute
     }
-    '/_authenticated/requests_/$requestId': {
-      id: '/_authenticated/requests_/$requestId'
-      path: '/requests/$requestId'
-      fullPath: '/requests/$requestId'
-      preLoaderRoute: typeof AuthenticatedRequestsRequestIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/_app/records/new': {
+      id: '/_app/records/new'
+      path: '/new'
+      fullPath: '/records/new'
+      preLoaderRoute: typeof AppRecordsNewRouteImport
+      parentRoute: typeof AppRecordsRoute
     }
-    '/_authenticated/clients_/$clientId': {
-      id: '/_authenticated/clients_/$clientId'
-      path: '/clients/$clientId'
-      fullPath: '/clients/$clientId'
-      preLoaderRoute: typeof AuthenticatedClientsClientIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/_app/records/$id/certificate': {
+      id: '/_app/records/$id/certificate'
+      path: '/certificate'
+      fullPath: '/records/$id/certificate'
+      preLoaderRoute: typeof AppRecordsIdCertificateRouteImport
+      parentRoute: typeof AppRecordsIdRoute
+    }
+    '/_app/records/$id/edit': {
+      id: '/_app/records/$id/edit'
+      path: '/edit'
+      fullPath: '/records/$id/edit'
+      preLoaderRoute: typeof AppRecordsIdEditRouteImport
+      parentRoute: typeof AppRecordsIdRoute
     }
   }
 }
 
-interface AuthenticatedRouteRouteChildren {
-  AuthenticatedActivityRoute: typeof AuthenticatedActivityRoute
-  AuthenticatedBillingRoute: typeof AuthenticatedBillingRoute
-  AuthenticatedClientsRoute: typeof AuthenticatedClientsRoute
-  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedFinancialYearsRoute: typeof AuthenticatedFinancialYearsRoute
-  AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
-  AuthenticatedRequestsRoute: typeof AuthenticatedRequestsRoute
-  AuthenticatedRolesRoute: typeof AuthenticatedRolesRoute
-  AuthenticatedTeamRoute: typeof AuthenticatedTeamRoute
-  AuthenticatedTemplatesRoute: typeof AuthenticatedTemplatesRoute
-  AuthenticatedClientsClientIdRoute: typeof AuthenticatedClientsClientIdRoute
-  AuthenticatedRequestsRequestIdRoute: typeof AuthenticatedRequestsRequestIdRoute
-  AuthenticatedTemplatesTemplateIdRoute: typeof AuthenticatedTemplatesTemplateIdRoute
+interface AppRecordsIdRouteChildren {
+  AppRecordsIdCertificateRoute: typeof AppRecordsIdCertificateRoute
+  AppRecordsIdEditRoute: typeof AppRecordsIdEditRoute
 }
 
-const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedActivityRoute: AuthenticatedActivityRoute,
-  AuthenticatedBillingRoute: AuthenticatedBillingRoute,
-  AuthenticatedClientsRoute: AuthenticatedClientsRoute,
-  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedFinancialYearsRoute: AuthenticatedFinancialYearsRoute,
-  AuthenticatedPortalRoute: AuthenticatedPortalRoute,
-  AuthenticatedRequestsRoute: AuthenticatedRequestsRoute,
-  AuthenticatedRolesRoute: AuthenticatedRolesRoute,
-  AuthenticatedTeamRoute: AuthenticatedTeamRoute,
-  AuthenticatedTemplatesRoute: AuthenticatedTemplatesRoute,
-  AuthenticatedClientsClientIdRoute: AuthenticatedClientsClientIdRoute,
-  AuthenticatedRequestsRequestIdRoute: AuthenticatedRequestsRequestIdRoute,
-  AuthenticatedTemplatesTemplateIdRoute: AuthenticatedTemplatesTemplateIdRoute,
+const AppRecordsIdRouteChildren: AppRecordsIdRouteChildren = {
+  AppRecordsIdCertificateRoute: AppRecordsIdCertificateRoute,
+  AppRecordsIdEditRoute: AppRecordsIdEditRoute,
 }
 
-const AuthenticatedRouteRouteWithChildren =
-  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+const AppRecordsIdRouteWithChildren = AppRecordsIdRoute._addFileChildren(
+  AppRecordsIdRouteChildren,
+)
+
+interface AppRecordsRouteChildren {
+  AppRecordsIdRoute: typeof AppRecordsIdRouteWithChildren
+  AppRecordsNewRoute: typeof AppRecordsNewRoute
+  AppRecordsIndexRoute: typeof AppRecordsIndexRoute
+}
+
+const AppRecordsRouteChildren: AppRecordsRouteChildren = {
+  AppRecordsIdRoute: AppRecordsIdRouteWithChildren,
+  AppRecordsNewRoute: AppRecordsNewRoute,
+  AppRecordsIndexRoute: AppRecordsIndexRoute,
+}
+
+const AppRecordsRouteWithChildren = AppRecordsRoute._addFileChildren(
+  AppRecordsRouteChildren,
+)
+
+interface AppRouteChildren {
+  AppChangePasswordRoute: typeof AppChangePasswordRoute
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppRecordsRoute: typeof AppRecordsRouteWithChildren
+  AppAdminUsersRoute: typeof AppAdminUsersRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppChangePasswordRoute: AppChangePasswordRoute,
+  AppDashboardRoute: AppDashboardRoute,
+  AppRecordsRoute: AppRecordsRouteWithChildren,
+  AppAdminUsersRoute: AppAdminUsersRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  AuthRoute: AuthRoute,
-  ConfirmRoute: ConfirmRoute,
+  AppRoute: AppRouteWithChildren,
+  AcceptInviteRoute: AcceptInviteRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  LoginRoute: LoginRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

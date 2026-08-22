@@ -1,135 +1,155 @@
 /**
- * Cloudflare R2 (S3-compatible) storage helpers.
+ * Storage helpers — Cloudflare R2 in production, local disk in dev.
  *
- * Upload strategy — two paths, tried in order:
- *   1. Presigned URL: browser PUTs directly to R2 (no server bandwidth used)
- *   2. Server proxy:  browser POSTs file to this server, server streams to R2
- *      (fallback when VPN/firewall blocks direct R2 connections)
- *
- * Required env vars (server-side only, no VITE_ prefix):
+ * R2 env vars (all optional — falls back to local disk if missing):
  *   R2_ACCOUNT_ID        — Cloudflare account ID
  *   R2_ACCESS_KEY_ID     — R2 API token access key
  *   R2_SECRET_ACCESS_KEY — R2 API token secret
- *   R2_BUCKET_NAME       — bucket name (e.g. "cavault")
- *   R2_PUBLIC_URL        — optional public bucket URL (if bucket is public)
+ *   R2_BUCKET_NAME       — bucket name
  */
 import { createServerFn } from "@tanstack/react-start";
-import { S3Client, DeleteObjectCommand, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  DeleteObjectCommand,
+  PutObjectCommand,
+  GetObjectCommand,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { requireAuth } from "@/lib/auth-middleware";
+import path from "node:path";
+import fs from "node:fs/promises";
+
+// ── helpers ───────────────────────────────────────────────────────────────────
+
+function isR2Configured() {
+  return !!(
+    process.env.R2_ACCOUNT_ID &&
+    process.env.R2_ACCESS_KEY_ID &&
+    process.env.R2_SECRET_ACCESS_KEY &&
+    process.env.R2_BUCKET_NAME
+  );
+}
 
 function getS3() {
-  const accountId = process.env.R2_ACCOUNT_ID;
-  const accessKeyId = process.env.R2_ACCESS_KEY_ID;
-  const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
-
-  if (!accountId || !accessKeyId || !secretAccessKey) {
-    throw new Error("R2 credentials not configured. Set R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY in env.");
-  }
-
   return new S3Client({
     region: "auto",
-    endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
-    credentials: { accessKeyId, secretAccessKey },
+    endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+    credentials: {
+      accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+    },
     forcePathStyle: true,
   });
 }
 
 function getBucket() {
-  const bucket = process.env.R2_BUCKET_NAME;
-  if (!bucket) throw new Error("R2_BUCKET_NAME not configured.");
-  return bucket;
+  return process.env.R2_BUCKET_NAME!;
 }
 
-// ── Get a presigned URL to upload a file directly from the browser ────────────
+// Local uploads directory (dev only)
+const LOCAL_UPLOADS_DIR = path.join(process.cwd(), "uploads");
+
+async function ensureUploadsDir() {
+  await fs.mkdir(LOCAL_UPLOADS_DIR, { recursive: true });
+}
+
+function localFilePath(key: string) {
+  // Sanitise key to prevent path traversal
+  const safe = key.replace(/\.\.\//g, "").replace(/^\/+/, "");
+  return path.join(LOCAL_UPLOADS_DIR, safe.replace(/\//g, "__"));
+}
+
+// ── getUploadUrl ──────────────────────────────────────────────────────────────
+// Returns a presigned PUT URL (R2) or a local proxy URL (dev)
+
 export const getUploadUrl = createServerFn({ method: "POST" })
   .middleware([requireAuth])
-  .validator((d: {
-    storagePath: string;
-    contentType: string;
-    contentLength: number;
-  }) => d)
+  .validator((d: { key: string; contentType: string }) => d)
   .handler(async ({ data }) => {
-    const s3 = getS3();
-    const bucket = getBucket();
-
-    if (data.contentLength > 50 * 1024 * 1024) {
-      throw new Error("File too large. Maximum size is 50 MB.");
+    if (isR2Configured()) {
+      const command = new PutObjectCommand({
+        Bucket: getBucket(),
+        Key: data.key,
+        ContentType: data.contentType,
+      });
+      const url = await getSignedUrl(getS3(), command, { expiresIn: 300 });
+      return { url, useProxy: false };
     }
 
-    const command = new PutObjectCommand({
-      Bucket: bucket,
-      Key: data.storagePath,
-      ContentType: data.contentType,
-      ContentLength: data.contentLength,
-    });
-
-    // Presigned URL valid for 5 minutes
-    const url = await getSignedUrl(s3, command, { expiresIn: 300 });
-    return { url, storagePath: data.storagePath };
+    // Dev: tell the client to use the proxy upload instead
+    return { url: "", useProxy: true };
   });
 
-// ── Proxy upload: browser sends file to this server, server streams to R2 ─────
-// Used as fallback when VPN/firewall blocks direct browser→R2 connections.
+// ── proxyUploadFile ───────────────────────────────────────────────────────────
+// Server-side upload: R2 in prod, local disk in dev
+
 export const proxyUploadFile = createServerFn({ method: "POST" })
   .middleware([requireAuth])
-  .validator((d: {
-    storagePath: string;
-    contentType: string;
-    fileBase64: string;
-  }) => d)
+  .validator(
+    (d: { key: string; contentType: string; base64: string }) => d
+  )
   .handler(async ({ data }) => {
-    const s3 = getS3();
-    const bucket = getBucket();
-
-    const buffer = Buffer.from(data.fileBase64, "base64");
+    const buffer = Buffer.from(data.base64, "base64");
 
     if (buffer.byteLength > 50 * 1024 * 1024) {
       throw new Error("File too large. Maximum size is 50 MB.");
     }
 
-    await s3.send(new PutObjectCommand({
-      Bucket: bucket,
-      Key: data.storagePath,
-      ContentType: data.contentType,
-      ContentLength: buffer.byteLength,
-      Body: buffer,
-    }));
+    if (isR2Configured()) {
+      await getS3().send(
+        new PutObjectCommand({
+          Bucket: getBucket(),
+          Key: data.key,
+          ContentType: data.contentType,
+          ContentLength: buffer.byteLength,
+          Body: buffer,
+        })
+      );
+    } else {
+      // Dev: save to local disk
+      await ensureUploadsDir();
+      await fs.writeFile(localFilePath(data.key), buffer);
+    }
 
-    return { storagePath: data.storagePath };
+    return { key: data.key };
   });
 
-// ── Get a presigned URL to download / view a file ────────────────────────────
+// ── getDownloadUrl ────────────────────────────────────────────────────────────
+
 export const getDownloadUrl = createServerFn({ method: "POST" })
   .middleware([requireAuth])
   .validator((d: { storagePath: string; fileName: string }) => d)
   .handler(async ({ data }) => {
-    const s3 = getS3();
-    const bucket = getBucket();
+    if (isR2Configured()) {
+      const command = new GetObjectCommand({
+        Bucket: getBucket(),
+        Key: data.storagePath,
+        ResponseContentDisposition: `inline; filename="${data.fileName}"`,
+      });
+      const url = await getSignedUrl(getS3(), command, { expiresIn: 600 });
+      return { url };
+    }
 
-    const command = new GetObjectCommand({
-      Bucket: bucket,
-      Key: data.storagePath,
-      ResponseContentDisposition: `attachment; filename="${data.fileName}"`,
-    });
-
-    // Presigned URL valid for 10 minutes
-    const url = await getSignedUrl(s3, command, { expiresIn: 600 });
+    // Dev: serve via local API route
+    const appUrl = process.env.APP_URL ?? "http://localhost:8082";
+    const url = `${appUrl}/api/local-file?key=${encodeURIComponent(data.storagePath)}&name=${encodeURIComponent(data.fileName)}`;
     return { url };
   });
 
-// ── Delete a file from R2 ─────────────────────────────────────────────────────
+// ── deleteStorageFile ─────────────────────────────────────────────────────────
+
 export const deleteStorageFile = createServerFn({ method: "POST" })
   .middleware([requireAuth])
   .validator((d: { storagePath: string }) => d)
   .handler(async ({ data }) => {
-    const s3 = getS3();
-    const bucket = getBucket();
-
-    await s3.send(new DeleteObjectCommand({
-      Bucket: bucket,
-      Key: data.storagePath,
-    }));
-
+    if (isR2Configured()) {
+      await getS3().send(
+        new DeleteObjectCommand({ Bucket: getBucket(), Key: data.storagePath })
+      );
+    } else {
+      try {
+        await fs.unlink(localFilePath(data.storagePath));
+      } catch {}
+    }
     return { success: true };
   });

@@ -1,8 +1,5 @@
-import "./lib/error-capture";
-
-import { consumeLastCapturedError } from "./lib/error-capture";
-import { renderErrorPage } from "./lib/error-page";
-import { scheduleStorageCleanup } from "./lib/cleanup";
+import path from "node:path";
+import fs from "node:fs/promises";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -19,45 +16,64 @@ async function getServerEntry(): Promise<ServerEntry> {
   return serverEntryPromise;
 }
 
-// h3 swallows in-handler throws into a normal 500 Response with body
-// {"unhandled":true,"message":"HTTPError"} — try/catch alone never fires for those.
-async function normalizeCatastrophicSsrResponse(response: Response): Promise<Response> {
-  if (response.status < 500) return response;
-  const contentType = response.headers.get("content-type") ?? "";
-  if (!contentType.includes("application/json")) return response;
+const LOCAL_UPLOADS_DIR = path.join(process.cwd(), "uploads");
 
-  const body = await response.clone().text();
-  if (!isH3SwallowedErrorBody(body)) return response;
-
-  console.error(consumeLastCapturedError() ?? new Error(`h3 swallowed SSR error: ${body}`));
-  return new Response(renderErrorPage(), {
-    status: 500,
-    headers: { "content-type": "text/html; charset=utf-8" },
-  });
+function localFilePath(key: string) {
+  const safe = key.replace(/\.\.\//g, "").replace(/^\/+/, "");
+  return path.join(LOCAL_UPLOADS_DIR, safe.replace(/\//g, "__"));
 }
 
-function isH3SwallowedErrorBody(body: string): boolean {
+async function handleLocalFile(request: Request): Promise<Response> {
+  const url = new URL(request.url);
+  const key = url.searchParams.get("key");
+  const name = url.searchParams.get("name") ?? "file";
+
+  if (!key) return new Response("Missing key", { status: 400 });
+
   try {
-    const payload = JSON.parse(body) as { unhandled?: unknown; message?: unknown };
-    return payload.unhandled === true && payload.message === "HTTPError";
+    const buffer = await fs.readFile(localFilePath(key));
+    const ext = path.extname(name).toLowerCase();
+    const mimeTypes: Record<string, string> = {
+      ".pdf": "application/pdf",
+      ".jpg": "image/jpeg",
+      ".jpeg": "image/jpeg",
+      ".png": "image/png",
+      ".gif": "image/gif",
+      ".webp": "image/webp",
+      ".doc": "application/msword",
+      ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      ".xls": "application/vnd.ms-excel",
+      ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      ".txt": "text/plain",
+    };
+    const contentType = mimeTypes[ext] ?? "application/octet-stream";
+    return new Response(buffer, {
+      headers: {
+        "Content-Type": contentType,
+        "Content-Disposition": `inline; filename="${name}"`,
+        "Cache-Control": "private, max-age=3600",
+      },
+    });
   } catch {
-    return false;
+    return new Response("File not found", { status: 404 });
   }
 }
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
-    scheduleStorageCleanup(); // no-op after first call; runs cleanup if 90 days elapsed
     try {
+      const url = new URL(request.url);
+
+      // Dev-only: serve locally uploaded files
+      if (url.pathname === "/api/local-file") {
+        return await handleLocalFile(request);
+      }
+
       const handler = await getServerEntry();
-      const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      return await handler.fetch(request, env, ctx);
     } catch (error) {
       console.error(error);
-      return new Response(renderErrorPage(), {
-        status: 500,
-        headers: { "content-type": "text/html; charset=utf-8" },
-      });
+      return new Response("Internal Server Error", { status: 500 });
     }
   },
 };

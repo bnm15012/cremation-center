@@ -1,5 +1,5 @@
 {
-  "name": "tanstack_start_ts",
+  "name": "cremation-system",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -12,7 +12,9 @@
     "format": "prettier --write .",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "bun run scripts/migrate.ts",
-    "db:studio": "drizzle-kit studio"
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "bun run scripts/seed.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.637.0",
@@ -62,6 +64,7 @@
     "lucide-react": "^0.575.0",
     "mysql2": "^3.22.6",
     "nodemailer": "6.9.15",
+    "razorpay": "2.9.6",
     "react": "^19.2.0",
     "react-day-picker": "^9.14.0",
     "react-dom": "^19.2.0",

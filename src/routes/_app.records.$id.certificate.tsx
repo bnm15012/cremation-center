@@ -1,22 +1,11 @@
-import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useParams, useRouter, Navigate, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { getRecord } from "@/lib/records.functions";
-import { getSession } from "@/lib/auth";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { ArrowLeftIcon, PrinterIcon } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { ArrowLeftIcon, PrinterIcon, Loader2Icon } from "lucide-react";
 
 export const Route = createFileRoute("/_app/records/$id/certificate")({
-  beforeLoad: async () => {
-    const session = await getSession();
-    if (session?.role !== "admin") throw redirect({ to: "/dashboard" });
-    return { session };
-  },
-  loader: async ({ params }) => {
-    const data = await getRecord({ data: { id: Number(params.id) } });
-    if (!data?.record) throw redirect({ to: "/records" });
-    return data;
-  },
   component: CertificatePage,
 });
 
@@ -36,7 +25,37 @@ function formatAge(value: number, unit: "years" | "months") {
 }
 
 function CertificatePage() {
-  const { record } = Route.useLoaderData();
+  const { id } = useParams({ from: "/_app/records/$id/certificate" });
+  const router = useRouter();
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["record", id],
+    queryFn: () => getRecord({ data: { id: Number(id) } }),
+  });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-100 flex items-center justify-center">
+        <Loader2Icon className="w-8 h-8 text-slate-400 animate-spin" />
+      </div>
+    );
+  }
+
+  if (error || !data?.record) {
+    return (
+      <div className="min-h-screen bg-slate-100 p-6 text-center">
+        <p className="text-slate-600">{error ? (error as any).message : "Record not found"}</p>
+        <Button onClick={() => router.navigate({ to: "/records" })} className="mt-4">
+          Back to Records
+        </Button>
+      </div>
+    );
+  }
+
+  if (!data.isAdmin) {
+    return <Navigate to="/dashboard" />;
+  }
+
+  const { record } = data;
 
   return (
     <div className="min-h-screen bg-slate-100">

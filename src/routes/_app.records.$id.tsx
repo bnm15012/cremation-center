@@ -76,9 +76,6 @@ function RecordDetailPage() {
   });
 
   const { pathname } = useLocation();
-  if (pathname.endsWith("/certificate") || pathname.endsWith("/edit")) {
-    return <Outlet />;
-  }
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["record", id] });
 
@@ -184,6 +181,10 @@ function RecordDetailPage() {
       setDocToDelete(null);
     }
   };
+
+  if (pathname.endsWith("/certificate") || pathname.endsWith("/edit")) {
+    return <Outlet />;
+  }
 
   if (isLoading) {
     return (

@@ -93,7 +93,11 @@ function RecordDetailPage() {
 
   const submitMut = useMutation({
     mutationFn: () => submitRecord({ data: { id: Number(id) } }),
-    onSuccess: () => { toast.success("Record submitted for review"); invalidate(); },
+    onSuccess: async () => {
+      toast.success("Record submitted for review");
+      await qc.invalidateQueries({ queryKey: ["record", id] });
+      await qc.refetchQueries({ queryKey: ["record", id] });
+    },
     onError: (e: any) => toast.error(e.message),
   });
 

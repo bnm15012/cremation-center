@@ -76,7 +76,7 @@ function RecordDetailPage() {
   });
 
   const { pathname } = useLocation();
-  if (pathname.endsWith("/certificate")) {
+  if (pathname.endsWith("/certificate") || pathname.endsWith("/edit")) {
     return <Outlet />;
   }
 

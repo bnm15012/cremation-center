@@ -69,7 +69,7 @@ function AppLayout() {
           <FlameIcon className="w-5 h-5 text-white" />
         </div>
         <div>
-          <p className="text-sm font-bold leading-none">Cremation Center</p>
+          <p className="text-sm font-bold leading-none">Cremation System</p>
           <p className="text-xs text-slate-400 mt-0.5">Records</p>
         </div>
         {onClose && (
@@ -141,7 +141,7 @@ function AppLayout() {
             {/* Mobile brand */}
             <div className="flex items-center gap-2 md:hidden">
               <FlameIcon className="w-5 h-5 text-orange-500" />
-              <span className="font-semibold text-slate-900 text-sm">Cremation Center</span>
+              <span className="font-semibold text-slate-900 text-sm">Cremation System</span>
             </div>
           </div>
 

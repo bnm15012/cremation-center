@@ -114,7 +114,7 @@ function AcceptInvitePage() {
           <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
             <FlameIcon className="w-9 h-9 text-orange-400" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900">Cremation Center</h1>
+          <h1 className="text-2xl font-bold text-slate-900">Cremation System</h1>
           <p className="text-sm text-slate-500 mt-1">Record Management System</p>
         </div>
 

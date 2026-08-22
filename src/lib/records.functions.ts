@@ -275,11 +275,11 @@ export const updateRecord = createServerFn({ method: "POST" })
 
     const isAdmin = me?.role === "admin";
 
-    // Staff can only edit their own draft/rejected records
+    // Staff can edit their own records until approved
     if (!isAdmin) {
       if (record.created_by !== userId) throw new Error("Forbidden");
-      if (record.status === "submitted" || record.status === "approved") {
-        throw new Error("Cannot edit a submitted or approved record");
+      if (record.status === "approved") {
+        throw new Error("Cannot edit an approved record");
       }
     }
 

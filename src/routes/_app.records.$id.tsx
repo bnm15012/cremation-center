@@ -207,8 +207,7 @@ function RecordDetailPage() {
   }
 
   const { record, creator, reviewer, documents, isAdmin } = data;
-  const canEdit =
-    isAdmin || record.status === "draft" || record.status === "rejected";
+  const canEdit = isAdmin || record.status !== "approved";
   const canSubmit = !isAdmin && (record.status === "draft" || record.status === "rejected");
   const canApproveReject = isAdmin && record.status === "submitted";
   const canUpload = record.status !== "approved";

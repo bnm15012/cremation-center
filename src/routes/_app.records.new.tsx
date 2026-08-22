@@ -1,9 +1,10 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useQuery } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { differenceInMonths } from "date-fns";
 import { createRecord, saveDocument } from "@/lib/records.functions";
 import { getAmcStatus } from "@/lib/amc.functions";
 import { getUploadUrl, proxyUploadFile } from "@/lib/storage";
@@ -40,6 +41,7 @@ const schema = z.object({
   date_of_death: z.string().min(1, "Date of death is required"),
   time_of_death: z.string().optional(),
   age_at_death: z.coerce.number().int().min(0).optional().or(z.literal("")),
+  age_at_death_unit: z.enum(["years", "months"]).default("years"),
   gender: z.enum(["male", "female", "other"]).optional(),
   nationality: z.string().optional(),
   religion: z.string().optional(),
@@ -60,6 +62,18 @@ type FormValues = z.infer<typeof schema>;
 // Pending file: selected locally, not yet uploaded
 type PendingFile = { id: string; file: File; uploading?: boolean };
 
+function formatAge(value?: number | string | null, unit?: "years" | "months") {
+  const num = Number(value);
+  if (!unit || Number.isNaN(num) || value === "" || value == null) return "—";
+  const totalMonths = unit === "years" ? num * 12 : num;
+  const years = Math.floor(totalMonths / 12);
+  const months = totalMonths % 12;
+  if (years > 0 && months > 0) return `${years} years ${months} months`;
+  if (years > 0) return `${years} years`;
+  if (months > 0) return `${months} months`;
+  return "—";
+}
+
 function NewRecordPage() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
@@ -75,9 +89,20 @@ function NewRecordPage() {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { deceased_name: "", date_of_death: "" },
+    defaultValues: { deceased_name: "", date_of_death: "", age_at_death_unit: "years" },
   });
   const deceasedName = form.watch("deceased_name");
+  const dateOfBirth = form.watch("date_of_birth");
+  const dateOfDeath = form.watch("date_of_death");
+
+  useEffect(() => {
+    if (!dateOfBirth || !dateOfDeath) return;
+    const months = differenceInMonths(new Date(dateOfDeath), new Date(dateOfBirth));
+    if (months >= 0) {
+      form.setValue("age_at_death", months, { shouldValidate: true });
+      form.setValue("age_at_death_unit", "months", { shouldValidate: true });
+    }
+  }, [dateOfBirth, dateOfDeath, form]);
 
   const addFiles = (files: FileList | null) => {
     if (!files || !deceasedName.trim()) return;
@@ -223,12 +248,14 @@ function NewRecordPage() {
               <Input type="date" {...form.register("date_of_birth")} />
             </Field>
 
-            <Field label="Age at Death">
-              <Input type="number" min={0} max={150} {...form.register("age_at_death")} placeholder="Age in years" />
-            </Field>
-
             <Field label="Date of Death *" error={form.formState.errors.date_of_death?.message}>
               <Input type="date" {...form.register("date_of_death")} />
+            </Field>
+
+            <Field label="Age at Death">
+              <div className="h-10 px-3 rounded-md border border-slate-200 bg-slate-50 flex items-center text-sm text-slate-700">
+                {formatAge(form.watch("age_at_death"), form.watch("age_at_death_unit"))}
+              </div>
             </Field>
 
             <Field label="Time of Death">

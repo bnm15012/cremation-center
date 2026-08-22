@@ -157,6 +157,7 @@ export const createRecord = createServerFn({ method: "POST" })
     date_of_death: string;
     time_of_death?: string;
     age_at_death?: number;
+    age_at_death_unit?: "years" | "months";
     gender?: "male" | "female" | "other";
     nationality?: string;
     religion?: string;
@@ -191,6 +192,7 @@ export const createRecord = createServerFn({ method: "POST" })
       date_of_death: new Date(data.date_of_death),
       time_of_death: data.time_of_death,
       age_at_death: data.age_at_death,
+      age_at_death_unit: data.age_at_death_unit ?? "years",
       gender: data.gender,
       nationality: data.nationality,
       religion: data.religion,
@@ -228,6 +230,7 @@ export const updateRecord = createServerFn({ method: "POST" })
     date_of_death?: string;
     time_of_death?: string;
     age_at_death?: number;
+    age_at_death_unit?: "years" | "months";
     gender?: "male" | "female" | "other";
     nationality?: string;
     religion?: string;

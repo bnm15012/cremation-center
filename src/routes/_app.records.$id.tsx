@@ -1,4 +1,4 @@
-import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
+import { createFileRoute, useRouter, Link, useLocation, Outlet } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getRecord, approveRecord, rejectRecord, submitRecord, deleteRecord, deleteDocument, saveDocument } from "@/lib/records.functions";
 import { getUploadUrl, proxyUploadFile, getDownloadUrl, deleteStorageFile } from "@/lib/storage";
@@ -74,6 +74,11 @@ function RecordDetailPage() {
     queryKey: ["record", id],
     queryFn: () => getRecord({ data: { id: Number(id) } }),
   });
+
+  const { pathname } = useLocation();
+  if (pathname.endsWith("/certificate")) {
+    return <Outlet />;
+  }
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["record", id] });
 
@@ -321,7 +326,7 @@ function RecordDetailPage() {
           <Detail label="Full Name" value={record.deceased_name} />
           <Detail label="Gender" value={record.gender} />
           <Detail label="Date of Birth" value={record.date_of_birth ? format(new Date(record.date_of_birth), "dd MMM yyyy") : null} />
-          <Detail label="Age at Death" value={record.age_at_death ? `${record.age_at_death} yrs` : null} />
+          <Detail label="Age at Death" value={record.age_at_death != null ? formatAge(record.age_at_death, record.age_at_death_unit) : null} />
           <Detail label="Date of Death" value={record.date_of_death ? format(new Date(record.date_of_death), "dd MMM yyyy") : null} />
           <Detail label="Time of Death" value={record.time_of_death} />
           <Detail label="Nationality" value={record.nationality} />
@@ -589,6 +594,16 @@ function RecordDetailPage() {
       </AlertDialog>
     </div>
   );
+}
+
+function formatAge(value: number, unit: "years" | "months") {
+  const totalMonths = unit === "years" ? value * 12 : value;
+  const years = Math.floor(totalMonths / 12);
+  const months = totalMonths % 12;
+  if (years > 0 && months > 0) return `${years} years ${months} months`;
+  if (years > 0) return `${years} years`;
+  if (months > 0) return `${months} months`;
+  return "0 months";
 }
 
 function slugify(name: string) {

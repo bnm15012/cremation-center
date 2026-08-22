@@ -20,7 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { ArrowLeftIcon, SaveIcon, SendIcon } from "lucide-react";
-import { format } from "date-fns";
+import { format, differenceInMonths } from "date-fns";
 
 export const Route = createFileRoute("/_app/records/$id/edit")({
   component: EditRecordPage,
@@ -32,6 +32,7 @@ const schema = z.object({
   date_of_death: z.string().min(1, "Date of death is required"),
   time_of_death: z.string().optional(),
   age_at_death: z.coerce.number().int().min(0).optional().or(z.literal("")),
+  age_at_death_unit: z.enum(["years", "months"]).default("years"),
   gender: z.enum(["male", "female", "other"]).optional(),
   nationality: z.string().optional(),
   religion: z.string().optional(),
@@ -55,6 +56,18 @@ function toDateInput(d: Date | null | undefined) {
   return format(new Date(d), "yyyy-MM-dd");
 }
 
+function formatAge(value?: number | string | null, unit?: "years" | "months") {
+  const num = Number(value);
+  if (!unit || Number.isNaN(num) || value === "" || value == null) return "—";
+  const totalMonths = unit === "years" ? num * 12 : num;
+  const years = Math.floor(totalMonths / 12);
+  const months = totalMonths % 12;
+  if (years > 0 && months > 0) return `${years} years ${months} months`;
+  if (years > 0) return `${years} years`;
+  if (months > 0) return `${months} months`;
+  return "—";
+}
+
 function EditRecordPage() {
   const { id } = Route.useParams();
   const router = useRouter();
@@ -68,6 +81,17 @@ function EditRecordPage() {
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
   });
+  const dateOfBirth = form.watch("date_of_birth");
+  const dateOfDeath = form.watch("date_of_death");
+
+  useEffect(() => {
+    if (!dateOfBirth || !dateOfDeath) return;
+    const months = differenceInMonths(new Date(dateOfDeath), new Date(dateOfBirth));
+    if (months >= 0) {
+      form.setValue("age_at_death", months, { shouldValidate: true });
+      form.setValue("age_at_death_unit", "months", { shouldValidate: true });
+    }
+  }, [dateOfBirth, dateOfDeath, form]);
 
   useEffect(() => {
     if (data?.record) {
@@ -78,6 +102,7 @@ function EditRecordPage() {
         date_of_death: toDateInput(r.date_of_death),
         time_of_death: r.time_of_death ?? "",
         age_at_death: r.age_at_death ?? undefined,
+        age_at_death_unit: r.age_at_death_unit ?? "years",
         gender: r.gender ?? undefined,
         nationality: r.nationality ?? "",
         religion: r.religion ?? "",
@@ -186,12 +211,14 @@ function EditRecordPage() {
               <Input type="date" {...form.register("date_of_birth")} />
             </Field>
 
-            <Field label="Age at Death">
-              <Input type="number" min={0} max={150} {...form.register("age_at_death")} />
-            </Field>
-
             <Field label="Date of Death *" error={form.formState.errors.date_of_death?.message}>
               <Input type="date" {...form.register("date_of_death")} />
+            </Field>
+
+            <Field label="Age at Death">
+              <div className="h-10 px-3 rounded-md border border-slate-200 bg-slate-50 flex items-center text-sm text-slate-700">
+                {formatAge(form.watch("age_at_death"), form.watch("age_at_death_unit"))}
+              </div>
             </Field>
 
             <Field label="Time of Death">

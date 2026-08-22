@@ -25,6 +25,16 @@ function fmt(d: string | Date | null | undefined, f = "dd MMMM yyyy") {
   try { return format(new Date(d), f); } catch { return "—"; }
 }
 
+function formatAge(value: number, unit: "years" | "months") {
+  const totalMonths = unit === "years" ? value * 12 : value;
+  const years = Math.floor(totalMonths / 12);
+  const months = totalMonths % 12;
+  if (years > 0 && months > 0) return `${years} years ${months} months`;
+  if (years > 0) return `${years} years`;
+  if (months > 0) return `${months} months`;
+  return "0 months";
+}
+
 function CertificatePage() {
   const { record } = Route.useLoaderData();
 
@@ -103,7 +113,7 @@ function CertificatePage() {
               <Row label="Date of Birth" value={fmt(record.date_of_birth)} />
               <Row label="Date of Death" value={fmt(record.date_of_death)} />
               <Row label="Time of Death" value={record.time_of_death ?? "—"} />
-              <Row label="Age at Death" value={record.age_at_death ? `${record.age_at_death} years` : "—"} />
+              <Row label="Age at Death" value={record.age_at_death != null ? formatAge(record.age_at_death, record.age_at_death_unit) : "—"} />
               <Row label="Gender" value={record.gender ? record.gender.charAt(0).toUpperCase() + record.gender.slice(1) : "—"} />
               <Row label="Nationality" value={record.nationality ?? "—"} />
               <Row label="Religion" value={record.religion ?? "—"} />

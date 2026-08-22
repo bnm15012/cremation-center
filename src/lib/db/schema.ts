@@ -46,6 +46,7 @@ export const cremation_records = mysqlTable("cremation_records", {
   date_of_death:      datetime("date_of_death").notNull(),
   time_of_death:      varchar("time_of_death", { length: 10 }),          // "HH:MM"
   age_at_death:       int("age_at_death"),
+  age_at_death_unit:  mysqlEnum("age_at_death_unit", ["years", "months"]).notNull().default("years"),
   gender:             mysqlEnum("gender", ["male", "female", "other"]),
   nationality:        varchar("nationality", { length: 100 }),
   religion:           varchar("religion", { length: 100 }),

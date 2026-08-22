@@ -27,7 +27,7 @@ export const Route = createRootRouteWithContext<{
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Cremation System — Record Management" },
+      { title: "Cremation Center — Record Management" },
       { name: "description", content: "Cremation centre record management system" },
       { name: "theme-color", content: "#1e293b" },
     ],

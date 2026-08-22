@@ -6,7 +6,7 @@
  *   SMTP_PORT  — e.g. 587 or 465
  *   SMTP_USER  — your email / API key user
  *   SMTP_PASS  — SMTP password / API key
- *   SMTP_FROM  — e.g. "Cremation System <noreply@example.com>"
+ *   SMTP_FROM  — e.g. "Cremation Center <noreply@example.com>"
  */
 import nodemailer from "nodemailer";
 
@@ -31,7 +31,7 @@ function getTransport() {
 }
 
 const FROM =
-  process.env.SMTP_FROM ?? "Cremation System <noreply@cremation.local>";
+  process.env.SMTP_FROM ?? "Cremation Center <noreply@cremation.local>";
 
 const APP_URL = process.env.APP_URL ?? "http://localhost:8082";
 
@@ -42,11 +42,11 @@ export async function sendPasswordResetEmail(email: string, otp: string) {
   await transport.sendMail({
     from: FROM,
     to: email,
-    subject: "Password reset code - Cremation System",
+    subject: "Password reset code - Cremation Center",
     html: `
       <div style="font-family:sans-serif;max-width:520px;margin:0 auto;color:#0f172a">
         <div style="background:#1e293b;padding:24px;border-radius:12px 12px 0 0;text-align:center">
-          <h1 style="color:#fb923c;margin:0;font-size:22px">Cremation System</h1>
+          <h1 style="color:#fb923c;margin:0;font-size:22px">Cremation Center</h1>
           <p style="color:#94a3b8;margin:4px 0 0;font-size:13px">Record Management System</p>
         </div>
         <div style="background:#ffffff;border:1px solid #e2e8f0;border-top:0;border-radius:0 0 12px 12px;padding:32px">
@@ -81,17 +81,17 @@ export async function sendInviteEmail(
   await transport.sendMail({
     from: FROM,
     to: email,
-    subject: "You've been invited to Cremation System",
+    subject: "You've been invited to Cremation Center",
     html: `
       <div style="font-family:sans-serif;max-width:520px;margin:0 auto;color:#0f172a">
         <div style="background:#1e293b;padding:24px;border-radius:12px 12px 0 0;text-align:center">
-          <h1 style="color:#fb923c;margin:0;font-size:22px">Cremation System</h1>
+          <h1 style="color:#fb923c;margin:0;font-size:22px">Cremation Center</h1>
           <p style="color:#94a3b8;margin:4px 0 0;font-size:13px">Record Management System</p>
         </div>
         <div style="background:#ffffff;border:1px solid #e2e8f0;border-top:0;border-radius:0 0 12px 12px;padding:32px">
           <h2 style="margin:0 0 8px">Hello, ${fullName}</h2>
           <p style="color:#475569;margin:0 0 20px">
-            You have been added as a <strong>${roleLabel}</strong> on Cremation System
+            You have been added as a <strong>${roleLabel}</strong> on Cremation Center
             record management system. Click the button below to set your password and activate
             your account.
           </p>

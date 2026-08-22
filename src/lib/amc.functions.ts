@@ -89,7 +89,7 @@ export const createAmcOrder = createServerFn({ method: "POST" })
       keyId: process.env.RAZORPAY_KEY_ID!,
       amount: AMC_AMOUNT_PAISE,
       currency: "INR",
-      name: "Cremation System",
+      name: "Cremation Center",
       description: `Yearly maintenance ${year}`,
     };
   });

@@ -78,7 +78,7 @@ function CertificatePage() {
                 </svg>
               </div>
             </div>
-            <p className="text-xs tracking-[0.3em] uppercase text-slate-500 mb-1">Cremation System — Record Management</p>
+            <p className="text-xs tracking-[0.3em] uppercase text-slate-500 mb-1">Cremation Center — Record Management</p>
             <h1 className="text-3xl font-bold tracking-wide text-slate-900 uppercase">
               Cremation Certificate
             </h1>
@@ -173,7 +173,7 @@ function CertificatePage() {
 
           {/* Footer */}
           <p className="text-center text-[10px] text-slate-400 mt-6">
-            This certificate is issued by Cremation System and is valid only with an authorised signature and official stamp.
+            This certificate is issued by Cremation Center and is valid only with an authorised signature and official stamp.
           </p>
         </div>
       </div>

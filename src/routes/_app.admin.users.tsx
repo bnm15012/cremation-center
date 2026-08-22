@@ -27,7 +27,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { PlusIcon, ShieldIcon, UserIcon } from "lucide-react";
 import { useState } from "react";
-import { format } from "date-fns";
+import { formatIST } from "@/lib/date-utils";
 
 export const Route = createFileRoute("/_app/admin/users")({
   beforeLoad: async ({ context }) => {
@@ -158,7 +158,7 @@ function ManageUsersPage() {
                   )}
                 </div>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  {user.email} · Joined {format(new Date(user.created_at), "dd MMM yyyy")}
+                  {user.email} · Joined {formatIST(user.created_at, "dd MMM yyyy")}
                 </p>
               </div>
               <Button

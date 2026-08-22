@@ -22,7 +22,7 @@ import {
   UserIcon,
 } from "lucide-react";
 import { useState } from "react";
-import { format } from "date-fns";
+import { formatIST } from "@/lib/date-utils";
 import { z } from "zod";
 
 const searchSchema = z.object({
@@ -169,9 +169,7 @@ function RecordsPage() {
                     <span className="flex items-center gap-1">
                       <CalendarIcon className="w-3.5 h-3.5" />
                       Died{" "}
-                      {record.date_of_death
-                        ? format(new Date(record.date_of_death), "dd MMM yyyy")
-                        : "—"}
+                      {formatIST(record.date_of_death, "dd MMM yyyy")}
                       {record.time_of_death ? ` at ${record.time_of_death}` : ""}
                     </span>
                     {record.next_of_kin_name && (

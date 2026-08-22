@@ -44,7 +44,7 @@ import {
   FilePdfIcon,
   ScrollTextIcon,
 } from "lucide-react";
-import { format } from "date-fns";
+import { formatIST } from "@/lib/date-utils";
 import { useState, useRef } from "react";
 import { cn } from "@/lib/utils";
 
@@ -332,9 +332,9 @@ function RecordDetailPage() {
         <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <Detail label="Full Name" value={record.deceased_name} />
           <Detail label="Gender" value={record.gender} />
-          <Detail label="Date of Birth" value={record.date_of_birth ? format(new Date(record.date_of_birth), "dd MMM yyyy") : null} />
+          <Detail label="Date of Birth" value={formatIST(record.date_of_birth, "dd MMM yyyy")} />
           <Detail label="Age at Death" value={record.age_at_death != null ? formatAge(record.age_at_death, record.age_at_death_unit) : null} />
-          <Detail label="Date of Death" value={record.date_of_death ? format(new Date(record.date_of_death), "dd MMM yyyy") : null} />
+          <Detail label="Date of Death" value={formatIST(record.date_of_death, "dd MMM yyyy")} />
           <Detail label="Time of Death" value={record.time_of_death} />
           <Detail label="Nationality" value={record.nationality} />
           <Detail label="Religion" value={record.religion} />
@@ -363,7 +363,7 @@ function RecordDetailPage() {
         <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <Detail
             label="Cremation Date"
-            value={record.cremation_date ? format(new Date(record.cremation_date), "dd MMM yyyy") : null}
+            value={formatIST(record.cremation_date, "dd MMM yyyy")}
           />
           <Detail label="Cremation Time" value={record.cremation_time} />
 
@@ -483,7 +483,7 @@ function RecordDetailPage() {
                     </p>
                     <p className="text-xs text-slate-400">
                       {formatFileSize(doc.file_size)} ·{" "}
-                      {format(new Date(doc.created_at), "dd MMM yyyy, h:mm a")}
+                      {formatIST(doc.created_at, "dd MMM yyyy, h:mm a")}
                     </p>
                   </div>
                   <div className="flex gap-1 shrink-0">

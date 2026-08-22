@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireAuth } from "@/lib/auth-middleware";
 import { eq, desc } from "drizzle-orm";
+import { differenceInCalendarDays } from "date-fns";
 import crypto from "node:crypto";
 
 const AMC_AMOUNT_INR = 5999;
@@ -19,7 +20,8 @@ async function getRazorpayInstance() {
 }
 
 function endOfYear(year: number) {
-  return new Date(`${year}-12-31T23:59:59.000`);
+  // Store valid_until as UTC 18:29:59, which is IST 23:59:59 (UTC+5:30)
+  return new Date(Date.UTC(year, 11, 31, 18, 29, 59));
 }
 
 // ── Get current AMC status ────────────────────────────────────────────────────
@@ -41,9 +43,8 @@ export const getAmcStatus = createServerFn({ method: "GET" })
     const currentYear = now.getFullYear();
     const validUntil = latest ? new Date(latest.valid_until) : null;
     const active = validUntil ? validUntil > now : false;
-    const msPerDay = 1000 * 60 * 60 * 24;
     const daysUntilExpiry = active && validUntil
-      ? Math.max(0, Math.ceil((validUntil.getTime() - now.getTime()) / msPerDay))
+      ? Math.max(0, differenceInCalendarDays(validUntil, now))
       : null;
 
     return {

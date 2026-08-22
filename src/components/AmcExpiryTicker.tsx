@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAmcStatus } from "@/lib/amc.functions";
-import { format } from "date-fns";
+import { formatIST } from "@/lib/date-utils";
 import { AlertTriangleIcon } from "lucide-react";
 
 type AmcExpiryTickerProps = {
@@ -17,7 +17,7 @@ export function AmcExpiryTicker({ role }: AmcExpiryTickerProps) {
   if (isLoading || !data?.isExpiringSoon) return null;
 
   const validUntil = data.latestValidUntil
-    ? format(new Date(data.latestValidUntil), "dd MMM yyyy")
+    ? formatIST(data.latestValidUntil, "dd MMM yyyy")
     : "31st Dec";
 
   const action = role === "admin" ? "Renew now" : "Contact admin to renew";

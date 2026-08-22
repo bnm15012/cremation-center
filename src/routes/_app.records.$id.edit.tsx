@@ -20,7 +20,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { ArrowLeftIcon, SaveIcon, SendIcon } from "lucide-react";
-import { format, differenceInMonths } from "date-fns";
+import { formatIST } from "@/lib/date-utils";
+import { differenceInMonths } from "date-fns";
 
 export const Route = createFileRoute("/_app/records/$id/edit")({
   component: EditRecordPage,
@@ -53,7 +54,7 @@ type FormValues = z.infer<typeof schema>;
 
 function toDateInput(d: Date | null | undefined) {
   if (!d) return "";
-  return format(new Date(d), "yyyy-MM-dd");
+  return formatIST(d, "yyyy-MM-dd");
 }
 
 function formatAge(value?: number | string | null, unit?: "years" | "months") {

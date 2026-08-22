@@ -1,7 +1,7 @@
 import { createFileRoute, useParams, useRouter, Navigate, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getRecord } from "@/lib/records.functions";
-import { format } from "date-fns";
+import { formatIST } from "@/lib/date-utils";
 import { Button } from "@/components/ui/button";
 import { ArrowLeftIcon, PrinterIcon, Loader2Icon } from "lucide-react";
 
@@ -10,8 +10,7 @@ export const Route = createFileRoute("/_app/records/$id/certificate")({
 });
 
 function fmt(d: string | Date | null | undefined, f = "dd MMMM yyyy") {
-  if (!d) return "—";
-  try { return format(new Date(d), f); } catch { return "—"; }
+  return formatIST(d, f);
 }
 
 function formatAge(value: number, unit: "years" | "months") {
@@ -175,7 +174,7 @@ function CertificatePage() {
           {/* Certificate No & Date Issued */}
           <div className="flex justify-between text-xs text-slate-500 mb-10 border-t border-slate-200 pt-4">
             <span>Certificate Ref: <strong className="text-slate-700">AK-{String(record.id).padStart(6, "0")}</strong></span>
-            <span>Issued on: <strong className="text-slate-700">{format(new Date(), "dd MMMM yyyy")}</strong></span>
+            <span>Issued on: <strong className="text-slate-700">{formatIST(new Date(), "dd MMMM yyyy")}</strong></span>
           </div>
 
           {/* Signature block */}

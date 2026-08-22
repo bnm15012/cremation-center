@@ -77,17 +77,21 @@ function RecordDetailPage() {
 
   const { pathname } = useLocation();
 
-  const invalidate = () => qc.invalidateQueries({ queryKey: ["record", id] });
+  const invalidateAll = async () => {
+    await qc.invalidateQueries({ queryKey: ["record", id] });
+    await qc.invalidateQueries({ queryKey: ["records"] });
+    await qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
+  };
 
   const approveMut = useMutation({
     mutationFn: () => approveRecord({ data: { id: Number(id) } }),
-    onSuccess: () => { toast.success("Record approved"); invalidate(); },
+    onSuccess: async () => { toast.success("Record approved"); await invalidateAll(); },
     onError: (e: any) => toast.error(e.message),
   });
 
   const rejectMut = useMutation({
     mutationFn: () => rejectRecord({ data: { id: Number(id), reason: rejectReason } }),
-    onSuccess: () => { toast.success("Record rejected"); setRejectDialogOpen(false); invalidate(); },
+    onSuccess: async () => { toast.success("Record rejected"); setRejectDialogOpen(false); await invalidateAll(); },
     onError: (e: any) => toast.error(e.message),
   });
 
@@ -95,18 +99,17 @@ function RecordDetailPage() {
     mutationFn: () => submitRecord({ data: { id: Number(id) } }),
     onSuccess: async () => {
       toast.success("Record submitted for review");
-      await qc.invalidateQueries({ queryKey: ["record", id] });
       await qc.refetchQueries({ queryKey: ["record", id] });
+      await invalidateAll();
     },
     onError: (e: any) => toast.error(e.message),
   });
 
   const deleteMut = useMutation({
     mutationFn: () => deleteRecord({ data: { recordId: Number(id) } }),
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Record deleted");
-      qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
-      qc.invalidateQueries({ queryKey: ["records"] });
+      await invalidateAll();
       router.navigate({ to: "/records" });
     },
     onError: (e: any) => toast.error(e.message),

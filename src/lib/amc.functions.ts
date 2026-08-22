@@ -39,13 +39,20 @@ export const getAmcStatus = createServerFn({ method: "GET" })
 
     const now = new Date();
     const currentYear = now.getFullYear();
-    const active = latest ? new Date(latest.valid_until) > now : false;
+    const validUntil = latest ? new Date(latest.valid_until) : null;
+    const active = validUntil ? validUntil > now : false;
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const daysUntilExpiry = active && validUntil
+      ? Math.max(0, Math.ceil((validUntil.getTime() - now.getTime()) / msPerDay))
+      : null;
 
     return {
       active,
       amountInr: AMC_AMOUNT_INR,
       latestValidUntil: latest?.valid_until ?? null,
       year: currentYear,
+      daysUntilExpiry,
+      isExpiringSoon: active && daysUntilExpiry !== null && daysUntilExpiry <= 7,
     };
   });
 

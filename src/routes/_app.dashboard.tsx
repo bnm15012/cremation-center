@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getDashboardStats } from "@/lib/records.functions";
+import { AmcExpiryTicker } from "@/components/AmcExpiryTicker";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -62,6 +63,8 @@ function DashboardPage() {
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
+      <AmcExpiryTicker role={session?.role ?? "staff"} />
+
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-900">

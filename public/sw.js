@@ -1,4 +1,4 @@
-// CA Vault — minimal service worker for PWA installability
+// Cremation System — minimal service worker for PWA installability
 // Network-first: always fetches fresh from server, no offline caching
 // (documents are sensitive — we don't cache them locally)
 

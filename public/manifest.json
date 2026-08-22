@@ -1,7 +1,7 @@
 {
-  "name": "CA Vault",
-  "short_name": "CA Vault",
-  "description": "Client document collection for CA firms",
+  "name": "Cremation System",
+  "short_name": "Cremation",
+  "description": "Cremation centre record management system",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

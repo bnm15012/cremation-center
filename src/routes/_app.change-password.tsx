@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { KeyRoundIcon, ArrowLeftIcon, EyeIcon, EyeOffIcon, CheckCircleIcon } from "lucide-react";
+import { KeyRoundIcon, EyeIcon, EyeOffIcon, CheckCircleIcon } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_app/change-password")({
@@ -78,27 +78,22 @@ function ChangePasswordPage() {
   return (
     <div className="p-6 max-w-lg mx-auto space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <Link to="/dashboard">
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <ArrowLeftIcon className="w-4 h-4" />
-          </Button>
-        </Link>
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Change Password</h1>
-          <p className="text-slate-500 text-sm mt-0.5">Set a new password for your account</p>
-        </div>
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">Change Password</h1>
+        <p className="text-slate-500 text-sm mt-0.5">Set a new password for your account</p>
       </div>
 
       <Card className="border border-slate-200 shadow-sm">
-        <CardHeader className="pb-3">
-          <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center mb-2">
+        <CardHeader className="pb-3 flex flex-row items-start gap-3">
+          <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center shrink-0">
             <KeyRoundIcon className="w-5 h-5 text-slate-600" />
           </div>
-          <CardTitle className="text-base">Set a new password</CardTitle>
-          <CardDescription>
-            Choose a strong new password. Minimum 8 characters.
-          </CardDescription>
+          <div className="space-y-1">
+            <CardTitle className="text-base">Set a new password</CardTitle>
+            <CardDescription>
+              Choose a strong new password. Minimum 8 characters.
+            </CardDescription>
+          </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">

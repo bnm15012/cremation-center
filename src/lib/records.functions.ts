@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { eq, desc, and, or, like, sql } from "drizzle-orm";
 import { requireAuth, requireAdmin } from "@/lib/auth-middleware";
+import { deleteFileByPath } from "@/lib/storage";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -525,6 +526,34 @@ export const toggleUserActive = createServerFn({ method: "POST" })
       .update(users)
       .set({ is_active: data.isActive, updated_at: new Date() })
       .where(eq(users.id, data.userId));
+
+    return { success: true };
+  });
+
+// ── Delete record (admin only) ────────────────────────────────────────────────
+export const deleteRecord = createServerFn({ method: "POST" })
+  .middleware([requireAdmin])
+  .validator((d: { recordId: number }) => d)
+  .handler(async ({ data }) => {
+    await assertAmcActive();
+
+    const { getDb } = await import("@/lib/db");
+    const { cremation_records, documents } = await import("@/lib/db/schema");
+    const db = getDb();
+
+    const docs = await db
+      .select({ id: documents.id, storage_path: documents.storage_path })
+      .from(documents)
+      .where(eq(documents.record_id, data.recordId));
+
+    for (const doc of docs) {
+      await deleteFileByPath(doc.storage_path);
+    }
+
+    await db.transaction(async (tx) => {
+      await tx.delete(documents).where(eq(documents.record_id, data.recordId));
+      await tx.delete(cremation_records).where(eq(cremation_records.id, data.recordId));
+    });
 
     return { success: true };
   });

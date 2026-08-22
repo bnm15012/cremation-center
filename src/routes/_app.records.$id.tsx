@@ -1,6 +1,6 @@
 import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getRecord, approveRecord, rejectRecord, submitRecord, deleteDocument, saveDocument } from "@/lib/records.functions";
+import { getRecord, approveRecord, rejectRecord, submitRecord, deleteRecord, deleteDocument, saveDocument } from "@/lib/records.functions";
 import { getUploadUrl, proxyUploadFile, getDownloadUrl, deleteStorageFile } from "@/lib/storage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -65,6 +65,8 @@ function RecordDetailPage() {
   const qc = useQueryClient();
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [docToDelete, setDocToDelete] = useState<{ id: number; storagePath: string; fileName: string } | null>(null);
   const [uploadingFiles, setUploadingFiles] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -90,6 +92,17 @@ function RecordDetailPage() {
   const submitMut = useMutation({
     mutationFn: () => submitRecord({ data: { id: Number(id) } }),
     onSuccess: () => { toast.success("Record submitted for review"); invalidate(); },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  const deleteMut = useMutation({
+    mutationFn: () => deleteRecord({ data: { recordId: Number(id) } }),
+    onSuccess: () => {
+      toast.success("Record deleted");
+      qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
+      qc.invalidateQueries({ queryKey: ["records"] });
+      router.navigate({ to: "/records" });
+    },
     onError: (e: any) => toast.error(e.message),
   });
 
@@ -153,14 +166,17 @@ function RecordDetailPage() {
     }
   };
 
-  const handleDeleteDoc = async (docId: number, storagePath: string, fileName: string) => {
+  const handleDeleteDoc = async () => {
+    if (!docToDelete) return;
     try {
-      await deleteDocument({ data: { documentId: docId } });
-      await deleteStorageFile({ data: { storagePath } });
-      toast.success(`${fileName} deleted`);
+      await deleteDocument({ data: { documentId: docToDelete.id } });
+      await deleteStorageFile({ data: { storagePath: docToDelete.storagePath } });
+      toast.success(`${docToDelete.fileName} deleted`);
       invalidate();
     } catch (err: any) {
       toast.error(err.message);
+    } finally {
+      setDocToDelete(null);
     }
   };
 
@@ -273,6 +289,17 @@ function RecordDetailPage() {
                 Generate Certificate
               </Button>
             </Link>
+          )}
+          {isAdmin && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-2 border-red-200 text-red-600 hover:bg-red-50"
+              onClick={() => setDeleteDialogOpen(true)}
+            >
+              <TrashIcon className="w-4 h-4" />
+              Delete
+            </Button>
           )}
         </div>
       </div>
@@ -461,7 +488,7 @@ function RecordDetailPage() {
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 text-slate-500 hover:text-red-600"
-                        onClick={() => handleDeleteDoc(doc.id, doc.storage_path, doc.file_name)}
+                        onClick={() => setDocToDelete({ id: doc.id, storagePath: doc.storage_path, fileName: doc.file_name })}
                       >
                         <TrashIcon className="w-4 h-4" />
                       </Button>
@@ -507,6 +534,59 @@ function RecordDetailPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Document Dialog */}
+      <AlertDialog open={!!docToDelete} onOpenChange={(open) => !open && setDocToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this document?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {docToDelete ? (
+                <>
+                  <span className="font-medium text-slate-700">{docToDelete.fileName}</span> will be
+                  permanently deleted. This action cannot be undone.
+                </>
+              ) : null}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDocToDelete(null)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteDoc}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Record Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this record?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the record and all uploaded documents. This action
+              cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeleteDialogOpen(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteMut.mutate()}
+              className="bg-red-600 hover:bg-red-700"
+              disabled={deleteMut.isPending}
+            >
+              {deleteMut.isPending ? "Deleting…" : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

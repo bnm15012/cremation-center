@@ -136,20 +136,26 @@ export const getDownloadUrl = createServerFn({ method: "POST" })
     return { url };
   });
 
+async function deleteFileByPath(storagePath: string) {
+  if (isR2Configured()) {
+    await getS3().send(
+      new DeleteObjectCommand({ Bucket: getBucket(), Key: storagePath })
+    );
+  } else {
+    try {
+      await fs.unlink(localFilePath(storagePath));
+    } catch {}
+  }
+}
+
+export { deleteFileByPath };
+
 // ── deleteStorageFile ─────────────────────────────────────────────────────────
 
 export const deleteStorageFile = createServerFn({ method: "POST" })
   .middleware([requireAuth])
   .validator((d: { storagePath: string }) => d)
   .handler(async ({ data }) => {
-    if (isR2Configured()) {
-      await getS3().send(
-        new DeleteObjectCommand({ Bucket: getBucket(), Key: data.storagePath })
-      );
-    } else {
-      try {
-        await fs.unlink(localFilePath(data.storagePath));
-      } catch {}
-    }
+    await deleteFileByPath(data.storagePath);
     return { success: true };
   });

@@ -1,5 +1,5 @@
 import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -71,6 +71,7 @@ function formatAge(value?: number | string | null, unit?: "years" | "months") {
 function EditRecordPage() {
   const { id } = Route.useParams();
   const router = useRouter();
+  const qc = useQueryClient();
   const [saving, setSaving] = useState(false);
 
   const { data, isLoading } = useQuery({
@@ -139,6 +140,9 @@ function EditRecordPage() {
         },
       });
       toast.success("Record updated");
+      await qc.invalidateQueries({ queryKey: ["record", id] });
+      await qc.invalidateQueries({ queryKey: ["records"] });
+      await qc.invalidateQueries({ queryKey: ["dashboard-stats"] });
       router.navigate({ to: "/records/$id", params: { id } });
     } catch (err: any) {
       toast.error(err.message ?? "Failed to update record");

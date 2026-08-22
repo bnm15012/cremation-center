@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireAuth } from "@/lib/auth-middleware";
 import { eq, desc } from "drizzle-orm";
 import { differenceInCalendarDays } from "date-fns";
+import { toIST } from "@/lib/date-utils";
 import crypto from "node:crypto";
 
 const AMC_AMOUNT_INR = 5999;
@@ -44,7 +45,7 @@ export const getAmcStatus = createServerFn({ method: "GET" })
     const validUntil = latest ? new Date(latest.valid_until) : null;
     const active = validUntil ? validUntil > now : false;
     const daysUntilExpiry = active && validUntil
-      ? Math.max(0, differenceInCalendarDays(validUntil, now))
+      ? Math.max(0, differenceInCalendarDays(toIST(validUntil), toIST(now)))
       : null;
 
     return {

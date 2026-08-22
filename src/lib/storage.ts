@@ -16,8 +16,6 @@ import {
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { requireAuth } from "@/lib/auth-middleware";
-import path from "node:path";
-import fs from "node:fs/promises";
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -46,17 +44,25 @@ function getBucket() {
   return process.env.R2_BUCKET_NAME!;
 }
 
-// Local uploads directory (dev only)
-const LOCAL_UPLOADS_DIR = path.join(process.cwd(), "uploads");
-
-async function ensureUploadsDir() {
-  await fs.mkdir(LOCAL_UPLOADS_DIR, { recursive: true });
+// Local uploads directory (dev only) — node modules loaded server-side only
+async function getUploadsDir() {
+  const path = await import("node:path");
+  return path.join(process.cwd(), "uploads");
 }
 
-function localFilePath(key: string) {
+async function ensureUploadsDir() {
+  const fs = await import("node:fs/promises");
+  const path = await import("node:path");
+  const dir = path.join(process.cwd(), "uploads");
+  await fs.mkdir(dir, { recursive: true });
+}
+
+async function localFilePath(key: string) {
+  const path = await import("node:path");
+  const dir = await getUploadsDir();
   // Sanitise key to prevent path traversal
   const safe = key.replace(/\.\.\//g, "").replace(/^\/+/, "");
-  return path.join(LOCAL_UPLOADS_DIR, safe.replace(/\//g, "__"));
+  return path.join(dir, safe.replace(/\//g, "__"));
 }
 
 // ── getUploadUrl ──────────────────────────────────────────────────────────────
@@ -107,8 +113,9 @@ export const proxyUploadFile = createServerFn({ method: "POST" })
       );
     } else {
       // Dev: save to local disk
+      const fs = await import("node:fs/promises");
       await ensureUploadsDir();
-      await fs.writeFile(localFilePath(data.key), buffer);
+      await fs.writeFile(await localFilePath(data.key), buffer);
     }
 
     return { key: data.key };
@@ -136,19 +143,20 @@ export const getDownloadUrl = createServerFn({ method: "POST" })
     return { url };
   });
 
-async function deleteFileByPath(storagePath: string) {
+// ── deleteFileByPath ─────────────────────────────────────────────────────────
+
+export async function deleteFileByPath(storagePath: string) {
   if (isR2Configured()) {
     await getS3().send(
       new DeleteObjectCommand({ Bucket: getBucket(), Key: storagePath })
     );
   } else {
+    const fs = await import("node:fs/promises");
     try {
-      await fs.unlink(localFilePath(storagePath));
+      await fs.unlink(await localFilePath(storagePath));
     } catch {}
   }
 }
-
-export { deleteFileByPath };
 
 // ── deleteStorageFile ─────────────────────────────────────────────────────────
 
